@@ -1,18 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             tools:context=".MainActivity">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:text="@string/what_day_is_it"
+            android:id="@+id/DayQuestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintVertical_chainStyle="packed"
+            android:layout_marginBottom="16dp" app:layout_constraintBottom_toTopOf="@+id/linearLayout"/>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="395dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp" android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:id="@+id/linearLayout"
+            app:layout_constraintTop_toBottomOf="@+id/DayQuestion" android:layout_marginTop="16dp">
+        <Button
+                android:text="@string/sunday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/SundayButton"
+        />
+        <Button
+                android:text="@string/monday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/MondayButton"/>
+        <Button
+                android:text="@string/tuesday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/TuesdayButton"/>
+        <Button
+                android:text="@string/wednesday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/WednesdayButton"/>
+        <Button
+                android:text="@string/thursday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/ThursdayButton"/>
+        <Button
+                android:text="@string/friday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/FridayButton"/>
+        <Button
+                android:text="@string/saturday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/SaturdayButton"/>
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
