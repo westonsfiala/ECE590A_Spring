@@ -43,9 +43,9 @@ open class OnSwipeTouchListener(context: Context) : View.OnTouchListener {
                 } else {
                     if (Math.abs(diffY) > mSwipeThreshold && Math.abs(velocityY) > mSwipeVelocityThreshold) {
                         if (diffY > 0) {
-                            onSwipeTop()
-                        } else {
                             onSwipeBottom()
+                        } else {
+                            onSwipeTop()
                         }
                     }
                 }
