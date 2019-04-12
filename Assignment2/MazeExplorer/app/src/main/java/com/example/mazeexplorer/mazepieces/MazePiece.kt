@@ -21,6 +21,4 @@ interface MazePiece {
     }
 
     fun getImageView(): ImageView
-
-
 }
