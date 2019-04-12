@@ -11,7 +11,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        DisplayText.setOnTouchListener(object : OnSwipeTouchListener(this) {
+        background.setOnTouchListener(object : OnSwipeTouchListener(this) {
             override fun onSwipeLeft() {
                 DisplayText.text = "Left"
             }
