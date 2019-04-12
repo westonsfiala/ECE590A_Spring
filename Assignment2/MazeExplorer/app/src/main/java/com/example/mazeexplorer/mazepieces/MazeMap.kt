@@ -6,6 +6,9 @@ import android.widget.TableRow
 
 class MazeMap(context: Context, rows: Int, columns: Int) : TableLayout(context)
 {
+
+    var location = 0
+
     init
     {
         val piece = Unexplored(context)
@@ -25,5 +28,25 @@ class MazeMap(context: Context, rows: Int, columns: Int) : TableLayout(context)
     private val columns = columns
 
 
+    fun start() {
+        setPiece(0,0)
+    }
+
+    private fun setPiece(row: Int, col: Int) {
+
+        // Don't do anything when we are out of bounds.
+        if(row < 0 || row > rows || col < 0 || col > columns)
+        {
+            return
+        }
+
+        val line = getChildAt(row) as TableRow
+
+        line.removeViewAt(col)
+
+        val goal = GoalPiece(context)
+
+        line.addView(goal.getImageView(),col)
+    }
 
 }

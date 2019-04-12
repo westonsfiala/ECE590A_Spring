@@ -20,23 +20,43 @@ class Maze : AppCompatActivity() {
             startActivity(intent)
         }
 
-        setupMaze()
+        background.setOnTouchListener(object : OnSwipeTouchListener(this) {
+            override fun onSwipeLeft() {
+                //DisplayText.text = "Left"
+            }
+
+            override fun onSwipeRight() {
+               //DisplayText.text = "Right"
+            }
+
+            override fun onSwipeTop() {
+                //DisplayText.text = "Top"
+            }
+
+            override fun onSwipeBottom() {
+                map.start()
+            }
+        })
+
+        val size = intent.getIntExtra("size", 5)
+
+        setupMaze(size)
     }
 
-    private fun setupMaze()
+    private fun setupMaze(size : Int)
     {
-        map = MazeMap(this,10,15)
+        map = MazeMap(this,size,size)
         map.id = "MazeMap".hashCode()
 
-        constraintLayout.addView(map)
+        background.addView(map)
 
         val set = ConstraintSet()
-        set.clone(constraintLayout)
+        set.clone(background)
 
         set.constrainWidth(map.id, ConstraintSet.WRAP_CONTENT)
         set.centerVertically(map.id, ConstraintSet.PARENT_ID)
         set.centerHorizontally(map.id, ConstraintSet.PARENT_ID)
 
-        set.applyTo(constraintLayout)
+        set.applyTo(background)
     }
 }

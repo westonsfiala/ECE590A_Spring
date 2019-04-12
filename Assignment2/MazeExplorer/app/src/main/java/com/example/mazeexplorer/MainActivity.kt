@@ -7,31 +7,41 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    private val smallSize = 6
+    private val mediumSize = 9
+    private val largeSize = 12
+
+    private var selectedSize : Int = 0
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        background.setOnTouchListener(object : OnSwipeTouchListener(this) {
-            override fun onSwipeLeft() {
-                DisplayText.text = "Left"
-            }
-
-            override fun onSwipeRight() {
-                DisplayText.text = "Right"
-            }
-
-            override fun onSwipeTop() {
-                DisplayText.text = "Top"
-            }
-
-            override fun onSwipeBottom() {
-                DisplayText.text = "Bottom"
-            }
-        })
+        StartMazeButton.isEnabled = false
 
         StartMazeButton.setOnClickListener {
             val intent = Intent(this@MainActivity, Maze::class.java)
+            intent.putExtra("size", selectedSize)
             startActivity(intent)
         }
+
+        SmallRadio.setOnClickListener{
+            setSize(smallSize)
+        }
+
+        MediumRadio.setOnClickListener{
+            setSize(mediumSize)
+        }
+
+        LargeRadio.setOnClickListener{
+            setSize(largeSize)
+        }
+    }
+
+    private fun setSize(size: Int)
+    {
+        selectedSize = size
+        StartMazeButton.isEnabled = true
     }
 }
