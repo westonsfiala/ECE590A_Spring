@@ -82,7 +82,20 @@ class Maze : AppCompatActivity() {
 
         piece.getLocationOnScreen(location)
 
+        // Put the piece in the center of the tile.
+        // Needs to account for centering, and the map height
         player.x = location[0].toFloat()
         player.y = location[1].toFloat()
+
+        // For some reason the height that is returned is just a bit off.
+        // Need to do this weird correction
+        player.x += piece.width / 2.0F
+        player.y += piece.height / 2.0F - piece.height / 6.0F
+
+        player.x -= player.width / 2.0F
+        player.y += player.height / 2.0F
+
+        player.x += 0.0F
+        player.y -= map.height / 2.0F
     }
 }
