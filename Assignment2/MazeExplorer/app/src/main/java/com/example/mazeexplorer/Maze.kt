@@ -1,21 +1,22 @@
 package com.example.mazeexplorer
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.constraint.ConstraintSet
-import com.example.mazeexplorer.mazepieces.MazeMap
+import android.support.v7.app.AppCompatActivity
 import com.example.mazeexplorer.mazepieces.Player
+import com.example.mazeexplorer.mazepieces.SaveableMazeMap
 import kotlinx.android.synthetic.main.activity_maze.*
 
 class Maze : AppCompatActivity() {
 
-    private lateinit var map: MazeMap
+    private var saveMap = SaveableMazeMap()
 
     private lateinit var player: Player
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_maze)
 
         ReturnButton.setOnClickListener {
@@ -25,45 +26,69 @@ class Maze : AppCompatActivity() {
 
         background.setOnTouchListener(object : OnSwipeTouchListener(this) {
             override fun onSwipeLeft() {
-                map.movePlayerLeft()
+                saveMap.map.movePlayerLeft()
                 movePlayer()
             }
 
             override fun onSwipeRight() {
-                map.movePlayerRight()
+                saveMap.map.movePlayerRight()
                 movePlayer()
             }
 
             override fun onSwipeTop() {
-                map.movePlayerUp()
+                saveMap.map.movePlayerUp()
                 movePlayer()
             }
 
             override fun onSwipeBottom() {
-                map.movePlayerDown()
+                saveMap.map.movePlayerDown()
                 movePlayer()
             }
         })
 
-        val size = intent.getIntExtra("size", 5)
+        val frag = supportFragmentManager.findFragmentByTag("SavedFragment")
 
-        setupMaze(size)
+        if(frag == null)
+        {
+            val size = intent.getIntExtra("size", 5)
+
+            createMaze(size)
+        }
+        else
+        {
+            saveMap = frag as SaveableMazeMap
+            background.removeView(saveMap.map)
+        }
+
+        displayMaze()
         setupPlayer()
     }
 
-    private fun setupMaze(size : Int)
-    {
-        map = MazeMap(this,size,size)
-        map.id = "MazeMap".hashCode()
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
 
-        background.addView(map)
+        supportFragmentManager.putFragment(outState, "SavedFragment", saveMap)
+
+        background.removeView(saveMap.map)
+    }
+
+    private fun createMaze(size : Int)
+    {
+        saveMap.createMap(this,size,size)
+        saveMap.map.id = "MazeMap".hashCode()
+
+        supportFragmentManager.beginTransaction().add(saveMap, "SavedFragment").commit()
+    }
+
+    private fun displayMaze() {
+        background.addView(saveMap.map)
 
         val set = ConstraintSet()
         set.clone(background)
 
-        set.constrainWidth(map.id, ConstraintSet.WRAP_CONTENT)
-        set.centerVertically(map.id, ConstraintSet.PARENT_ID)
-        set.centerHorizontally(map.id, ConstraintSet.PARENT_ID)
+        set.constrainWidth(saveMap.map.id, ConstraintSet.WRAP_CONTENT)
+        set.centerVertically(saveMap.map.id, ConstraintSet.PARENT_ID)
+        set.centerHorizontally(saveMap.map.id, ConstraintSet.PARENT_ID)
 
         set.applyTo(background)
     }
@@ -75,12 +100,12 @@ class Maze : AppCompatActivity() {
         background.addView(player)
 
         // When the map is ready, perform the move player action.
-        map.post {movePlayer()}
+        saveMap.map.post {movePlayer()}
     }
 
     private fun movePlayer() {
 
-        val location = map.getCurrentPieceLocationCenter()
+        val location = saveMap.map.getCurrentPieceLocationCenter()
 
         // Adjust the player location to be centered in the tile
         player.x = location[0] - player.width / 2

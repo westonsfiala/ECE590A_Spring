@@ -1,20 +1,42 @@
 package com.example.mazeexplorer.mazepieces
 
+import android.support.v4.app.Fragment
 import android.content.Context
 import android.widget.TableLayout
 import android.widget.TableRow
 import com.example.mazeexplorer.MazePiece
 import kotlin.random.Random
+import android.os.Bundle
 
-class MazeMap(context: Context, private val rows: Int, private val columns: Int) : TableLayout(context)
-{
+
+class SaveableMazeMap : Fragment() {
+
+    // this method is only called once for this fragment
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // retain this fragment
+        retainInstance = true
+    }
+
+    // data object we want to retain
+    lateinit var map: MazeMap
+
+    fun createMap(context: Context, rows: Int, columns: Int) {
+
+        // data object we want to retain
+        map = MazeMap(context, rows, columns)
+    }
+}
+
+class MazeMap(context: Context, private val rows: Int, private val columns: Int) : TableLayout(context) {
+
     private var playerRow = 0
     private var playerCol = 0
 
     private val startTile = Fourway(context)
     private val unexplored = Unexplored(context)
 
-    private val allMazePieces : Array <MazePiece> = arrayOf(
+    private val allMazePieces: Array<MazePiece> = arrayOf(
         CornerBottomLeft(context),
         CornerBottomRight(context),
         CornerTopLeft(context),
@@ -33,18 +55,16 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         TRight(context)
     )
 
-    init
-    {
+    init {
         blankMap()
         start()
     }
 
-    fun getCurrentPieceLocationCenter() : FloatArray {
+    fun getCurrentPieceLocationCenter(): FloatArray {
         val location = FloatArray(2)
 
-        if(!isInBounds(playerRow, playerCol))
-        {
-            return floatArrayOf(0.0f,0.0f)
+        if (!isInBounds(playerRow, playerCol)) {
+            return floatArrayOf(0.0f, 0.0f)
         }
 
         val piece = getPiece(playerRow, playerCol)
@@ -57,34 +77,32 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     fun movePlayerUp() {
-        if(getPiece(playerRow,playerCol).isOpenTop())
-        {
-            movePlayer(-1,0)
+        if (getPiece(playerRow, playerCol).isOpenTop()) {
+            movePlayer(-1, 0)
         }
     }
 
     fun movePlayerDown() {
-        if(getPiece(playerRow,playerCol).isOpenBottom()) {
+        if (getPiece(playerRow, playerCol).isOpenBottom()) {
             movePlayer(1, 0)
         }
     }
 
     fun movePlayerLeft() {
-        if(getPiece(playerRow,playerCol).isOpenLeft()) {
+        if (getPiece(playerRow, playerCol).isOpenLeft()) {
             movePlayer(0, -1)
         }
     }
 
     fun movePlayerRight() {
 
-        if(getPiece(playerRow,playerCol).isOpenRight()) {
+        if (getPiece(playerRow, playerCol).isOpenRight()) {
             movePlayer(0, 1)
         }
     }
 
 
-    private fun movePlayer(row: Int, col: Int)
-    {
+    private fun movePlayer(row: Int, col: Int) {
         playerRow += row
         playerCol += col
 
@@ -95,26 +113,26 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
 
         val piece = unexplored
 
-        for( row in 0 until columns) {
+        for (row in 0 until columns) {
             val line = TableRow(context)
 
-            for( col in 0 until rows) {
+            for (col in 0 until rows) {
                 line.addView(piece.clone(), col)
             }
 
-            addView(line,row)
+            addView(line, row)
         }
     }
 
     private fun start() {
 
         // First piece will be somewhere in the middle.
-        val row = Random.nextInt(1, rows-1)
-        val column = Random.nextInt(1, rows-1)
+        val row = Random.nextInt(1, rows - 1)
+        val column = Random.nextInt(1, rows - 1)
         val piece = Fourway(context)
 
-        setPiece(row,column, piece)
-        revealAdjacent(row,column)
+        setPiece(row, column, piece)
+        revealAdjacent(row, column)
 
         playerRow = row
         playerCol = column
@@ -123,24 +141,22 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     private fun setPiece(row: Int, col: Int, piece: MazePiece) {
 
         // Don't do anything when we are out of bounds.
-        if(!isInBounds(row,col))
-        {
+        if (!isInBounds(row, col)) {
             return
         }
 
         // Swap out the piece for something we care about.
         val line = getChildAt(row) as TableRow
         line.removeViewAt(col)
-        line.addView(piece.clone(),col)
+        line.addView(piece.clone(), col)
     }
 
     // Get the piece that is placed at the the given coordinates.
     // If out of bounds, returns unexplored
-    private fun getPiece(row: Int, col: Int) : MazePiece {
+    private fun getPiece(row: Int, col: Int): MazePiece {
 
         // Return unexplored when out of bounds
-        if(!isInBounds(row,col))
-        {
+        if (!isInBounds(row, col)) {
             return unexplored
         }
 
@@ -160,76 +176,67 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     private fun revealTop(row: Int, col: Int) {
 
         // Can't reveal outside of the bounds
-        if(!isInBounds(row - 1, col))
-        {
+        if (!isInBounds(row - 1, col)) {
             return
         }
 
         // Current piece doesn't allow revealing top
         val knownPiece = getPiece(row, col)
-        if(!knownPiece.isOpenTop())
-        {
+        if (!knownPiece.isOpenTop()) {
             return
         }
 
         // The top piece is already explored, nothing to reveal
         val piece = getPiece(row - 1, col)
-        if(piece.isExplored())
-        {
+        if (piece.isExplored()) {
             return
         }
 
         // Get a new piece and place it
-        setPiece(row-1, col, getNewPiece(row-1, col))
+        setPiece(row - 1, col, getNewPiece(row - 1, col))
     }
 
     // Reveal the piece directly below the current piece.
     private fun revealBottom(row: Int, col: Int) {
 
         // Can't reveal outside of the bounds
-        if(!isInBounds(row + 1, col))
-        {
+        if (!isInBounds(row + 1, col)) {
             return
         }
 
         // Current piece doesn't allow revealing bottom
         val knownPiece = getPiece(row, col)
-        if(!knownPiece.isOpenBottom())
-        {
+        if (!knownPiece.isOpenBottom()) {
             return
         }
 
         // The top piece is already explored, nothing to reveal
         val piece = getPiece(row + 1, col)
-        if(piece.isExplored())
-        {
+        if (piece.isExplored()) {
             return
         }
 
         // Get a new piece and place it
-        setPiece(row+1, col, getNewPiece(row+1, col))
+        setPiece(row + 1, col, getNewPiece(row + 1, col))
     }
 
     // Reveal the piece directly left of the current piece.
     private fun revealLeft(row: Int, col: Int) {
 
         // Can't reveal outside of the bounds
-        if(!isInBounds(row, col - 1))
-        {
+        if (!isInBounds(row, col - 1)) {
             return
         }
 
         // Current piece doesn't allow revealing left
         val knownPiece = getPiece(row, col)
-        if(!knownPiece.isOpenLeft())
-        {
+        if (!knownPiece.isOpenLeft()) {
             return
         }
 
         // The top piece is already explored, nothing to reveal
         val piece = getPiece(row, col - 1)
-        if(piece.isExplored())
-        {
+        if (piece.isExplored()) {
             return
         }
 
@@ -241,22 +248,19 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     private fun revealRight(row: Int, col: Int) {
 
         // Can't reveal outside of the bounds
-        if(!isInBounds(row, col + 1))
-        {
+        if (!isInBounds(row, col + 1)) {
             return
         }
 
         // Current piece doesn't allow revealing left
         val knownPiece = getPiece(row, col)
-        if(!knownPiece.isOpenRight())
-        {
+        if (!knownPiece.isOpenRight()) {
             return
         }
 
         // The top piece is already explored, nothing to reveal
         val piece = getPiece(row, col + 1)
-        if(piece.isExplored())
-        {
+        if (piece.isExplored()) {
             return
         }
 
@@ -264,7 +268,7 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         setPiece(row, col + 1, getNewPiece(row, col + 1))
     }
 
-    private fun getNewPiece(row: Int, col: Int) : MazePiece {
+    private fun getNewPiece(row: Int, col: Int): MazePiece {
         val validPieces: MutableList<MazePiece> = mutableListOf()
 
         val mustHaveOpenTop = mustHaveTopOpening(row, col)
@@ -279,21 +283,20 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         val mustHaveOpenRight = mustHaveRightOpening(row, col)
         val cannotHaveOpenRight = cantHaveRightOpening(row, col)
 
-        for(piece in allMazePieces)
-        {
-            if(piece.isOpenTop() && cannotHaveOpenTop || !piece.isOpenTop() && mustHaveOpenTop) {
+        for (piece in allMazePieces) {
+            if (piece.isOpenTop() && cannotHaveOpenTop || !piece.isOpenTop() && mustHaveOpenTop) {
                 continue
             }
 
-            if(piece.isOpenBottom() && cannotHaveOpenBottom || !piece.isOpenBottom() && mustHaveOpenBottom) {
+            if (piece.isOpenBottom() && cannotHaveOpenBottom || !piece.isOpenBottom() && mustHaveOpenBottom) {
                 continue
             }
 
-            if(piece.isOpenLeft() && cannotHaveOpenLeft || !piece.isOpenLeft() && mustHaveOpenLeft) {
+            if (piece.isOpenLeft() && cannotHaveOpenLeft || !piece.isOpenLeft() && mustHaveOpenLeft) {
                 continue
             }
 
-            if(piece.isOpenRight() && cannotHaveOpenRight || !piece.isOpenRight() && mustHaveOpenRight) {
+            if (piece.isOpenRight() && cannotHaveOpenRight || !piece.isOpenRight() && mustHaveOpenRight) {
                 continue
             }
 
@@ -301,8 +304,7 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         }
 
         // If no valid pieces were found, ditch out.
-        if(validPieces.size == 0)
-        {
+        if (validPieces.size == 0) {
             return unexplored
         }
 
@@ -313,18 +315,16 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     // Checks if the piece at the given coordinates must have a top opening
-    private fun mustHaveTopOpening(row: Int, col: Int) : Boolean {
+    private fun mustHaveTopOpening(row: Int, col: Int): Boolean {
 
         // You do not need a top opening if you are at the edge of map
-        if(!isInBounds(row-1,col))
-        {
+        if (!isInBounds(row - 1, col)) {
             return false
         }
 
         // If the piece is not explored, no need to force a top
-        val piece = getPiece(row-1,col)
-        if(!piece.isExplored())
-        {
+        val piece = getPiece(row - 1, col)
+        if (!piece.isExplored()) {
             return false
         }
 
@@ -333,18 +333,16 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     // Checks if the piece at the given coordinates can't have a top opening
-    private fun cantHaveTopOpening(row: Int, col: Int) : Boolean {
+    private fun cantHaveTopOpening(row: Int, col: Int): Boolean {
 
         // You can never go out of bounds
-        if(!isInBounds(row-1,col))
-        {
+        if (!isInBounds(row - 1, col)) {
             return true
         }
 
         // If the piece is not explored, not need to force no top
-        val piece = getPiece(row-1,col)
-        if(!piece.isExplored())
-        {
+        val piece = getPiece(row - 1, col)
+        if (!piece.isExplored()) {
             return false
         }
 
@@ -353,18 +351,16 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     // Checks if the piece at the given coordinates must have a bottom opening
-    private fun mustHaveBottomOpening(row: Int, col: Int) : Boolean {
+    private fun mustHaveBottomOpening(row: Int, col: Int): Boolean {
 
         // You do not need a bottom opening if you are at the edge of map
-        if(!isInBounds(row+1,col))
-        {
+        if (!isInBounds(row + 1, col)) {
             return false
         }
 
         // If the piece is not explored, no need to force a bottom
-        val piece = getPiece(row+1,col)
-        if(!piece.isExplored())
-        {
+        val piece = getPiece(row + 1, col)
+        if (!piece.isExplored()) {
             return false
         }
 
@@ -373,18 +369,16 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     // Checks if the piece at the given coordinates can't have a bottom opening
-    private fun cantHaveBottomOpening(row: Int, col: Int) : Boolean {
+    private fun cantHaveBottomOpening(row: Int, col: Int): Boolean {
 
         // You can never go out of bounds
-        if(!isInBounds(row+1,col))
-        {
+        if (!isInBounds(row + 1, col)) {
             return true
         }
 
         // If the piece is not explored, not need to force no bottom
-        val piece = getPiece(row+1,col)
-        if(!piece.isExplored())
-        {
+        val piece = getPiece(row + 1, col)
+        if (!piece.isExplored()) {
             return false
         }
 
@@ -393,18 +387,16 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     // Checks if the piece at the given coordinates must have a left opening
-    private fun mustHaveLeftOpening(row: Int, col: Int) : Boolean {
+    private fun mustHaveLeftOpening(row: Int, col: Int): Boolean {
 
         // You do not need a left opening if you are at the edge of map
-        if(!isInBounds(row,col-1))
-        {
+        if (!isInBounds(row, col - 1)) {
             return false
         }
 
         // If the piece is not explored, no need to force a left
-        val piece = getPiece(row,col-1)
-        if(!piece.isExplored())
-        {
+        val piece = getPiece(row, col - 1)
+        if (!piece.isExplored()) {
             return false
         }
 
@@ -413,18 +405,16 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     // Checks if the piece at the given coordinates can't have a left opening
-    private fun cantHaveLeftOpening(row: Int, col: Int) : Boolean {
+    private fun cantHaveLeftOpening(row: Int, col: Int): Boolean {
 
         // You can never go out of bounds
-        if(!isInBounds(row,col-1))
-        {
+        if (!isInBounds(row, col - 1)) {
             return true
         }
 
         // If the piece is not explored, not need to force no left
-        val piece = getPiece(row,col-1)
-        if(!piece.isExplored())
-        {
+        val piece = getPiece(row, col - 1)
+        if (!piece.isExplored()) {
             return false
         }
 
@@ -433,18 +423,16 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     // Checks if the piece at the given coordinates must have a right opening
-    private fun mustHaveRightOpening(row: Int, col: Int) : Boolean {
+    private fun mustHaveRightOpening(row: Int, col: Int): Boolean {
 
         // You do not need a right opening if you are at the edge of map
-        if(!isInBounds(row,col+1))
-        {
+        if (!isInBounds(row, col + 1)) {
             return false
         }
 
         // If the piece is not explored, no need to force a right
-        val piece = getPiece(row,col+1)
-        if(!piece.isExplored())
-        {
+        val piece = getPiece(row, col + 1)
+        if (!piece.isExplored()) {
             return false
         }
 
@@ -453,18 +441,16 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     // Checks if the piece at the given coordinates can't have a right opening
-    private fun cantHaveRightOpening(row: Int, col: Int) : Boolean {
+    private fun cantHaveRightOpening(row: Int, col: Int): Boolean {
 
         // You can never go out of bounds
-        if(!isInBounds(row,col+1))
-        {
+        if (!isInBounds(row, col + 1)) {
             return true
         }
 
         // If the piece is not explored, not need to force no right
-        val piece = getPiece(row,col+1)
-        if(!piece.isExplored())
-        {
+        val piece = getPiece(row, col + 1)
+        if (!piece.isExplored()) {
             return false
         }
 
@@ -472,10 +458,8 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         return !piece.isOpenLeft()
     }
 
-    private fun isInBounds(row: Int, col: Int) : Boolean {
-        return row in 0..(rows - 1) && col in 0..(rows-1)
+    private fun isInBounds(row: Int, col: Int): Boolean {
+        return row in 0..(rows - 1) && col in 0..(rows - 1)
     }
-
-
 
 }

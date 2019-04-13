@@ -1,0 +1,31 @@
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center|top"
+        android:id="@+id/myLayout"
+        tools:context=".MainActivity">
+
+    <TextView
+            android:id="@+id/swipe_text"
+            android:text="Swipe me!"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:padding="30dp"
+            android:layout_marginBottom="50dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    <ImageView
+            android:id="@+id/knote_bitmap"
+            android:src="@drawable/butterfly"
+            android:text="Swipe this button!"
+            android:textSize="24sp"
+            android:layout_gravity="center"
+            android:foregroundGravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+</LinearLayout>
