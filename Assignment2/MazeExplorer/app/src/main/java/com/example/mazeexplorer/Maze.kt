@@ -5,11 +5,14 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.constraint.ConstraintSet
 import com.example.mazeexplorer.mazepieces.MazeMap
+import com.example.mazeexplorer.mazepieces.Player
 import kotlinx.android.synthetic.main.activity_maze.*
 
 class Maze : AppCompatActivity() {
 
     private lateinit var map: MazeMap
+
+    private lateinit var player: Player
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,25 +25,30 @@ class Maze : AppCompatActivity() {
 
         background.setOnTouchListener(object : OnSwipeTouchListener(this) {
             override fun onSwipeLeft() {
-                //DisplayText.text = "Left"
+                map.movePlayerLeft()
+                movePlayer()
             }
 
             override fun onSwipeRight() {
-               //DisplayText.text = "Right"
+                map.movePlayerRight()
+                movePlayer()
             }
 
             override fun onSwipeTop() {
-                //DisplayText.text = "Top"
+                map.movePlayerUp()
+                movePlayer()
             }
 
             override fun onSwipeBottom() {
-                //map.start()
+                map.movePlayerDown()
+                movePlayer()
             }
         })
 
         val size = intent.getIntExtra("size", 5)
 
         setupMaze(size)
+        setupPlayer()
     }
 
     private fun setupMaze(size : Int)
@@ -58,5 +66,23 @@ class Maze : AppCompatActivity() {
         set.centerHorizontally(map.id, ConstraintSet.PARENT_ID)
 
         set.applyTo(background)
+    }
+
+    private fun setupPlayer() {
+        player = Player(this)
+        player.id = "Player".hashCode()
+
+        background.addView(player)
+    }
+
+    private fun movePlayer() {
+        val piece = map.getCurrentPiece()
+
+        var location = IntArray(2)
+
+        piece.getLocationOnScreen(location)
+
+        player.x = location[0].toFloat()
+        player.y = location[1].toFloat()
     }
 }

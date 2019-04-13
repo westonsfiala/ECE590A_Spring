@@ -8,6 +8,9 @@ import kotlin.random.Random
 
 class MazeMap(context: Context, private val rows: Int, private val columns: Int) : TableLayout(context)
 {
+    private var playerRow = 0
+    private var playerCol = 0
+
     private val startTile = Fourway(context)
     private val unexplored = Unexplored(context)
 
@@ -36,6 +39,53 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         start()
     }
 
+    fun getCurrentPiece() : MazePiece {
+        return getPiece(playerRow, playerCol)
+    }
+
+    fun movePlayerUp() {
+        movePlayer(-1,0)
+    }
+
+    fun movePlayerDown() {
+        movePlayer(1,0)
+    }
+
+    fun movePlayerLeft() {
+        movePlayer(0,-1)
+    }
+
+    fun movePlayerRight() {
+        movePlayer(0,1)
+    }
+
+
+    private fun movePlayer(row: Int, col: Int)
+    {
+        playerRow += row
+        playerCol += col
+
+        if(playerRow < 0)
+        {
+            playerRow = 0
+        }
+
+        if(playerRow >= rows)
+        {
+            playerRow = rows - 1
+        }
+
+        if(playerCol < 0)
+        {
+            playerCol = 0
+        }
+
+        if(playerCol >= columns)
+        {
+            playerCol = columns - 1
+        }
+    }
+
     private fun blankMap() {
 
         val piece = unexplored
@@ -60,6 +110,9 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
 
         setPiece(row,column, piece)
         revealAdjacent(row,column)
+
+        playerRow = row
+        playerCol = column
     }
 
     private fun setPiece(row: Int, col: Int, piece: MazePiece) {
