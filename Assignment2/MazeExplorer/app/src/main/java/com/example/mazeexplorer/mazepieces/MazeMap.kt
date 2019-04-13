@@ -93,9 +93,9 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     // Reveal all of the pieces that are adjacent to the known piece.
     private fun revealAdjacent(row: Int, col: Int) {
         revealTop(row, col)
-        //revealBottom(row, col)
-        //revealLeft(row, col)
-        //revealRight(row, col)
+        revealBottom(row, col)
+        revealLeft(row, col)
+        revealRight(row, col)
     }
 
     // Reveal the piece directly above the current piece.
@@ -125,15 +125,117 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         setPiece(row-1, col, getNewPiece(row-1, col))
     }
 
+    // Reveal the piece directly below the current piece.
+    private fun revealBottom(row: Int, col: Int) {
+
+        // Can't reveal outside of the bounds
+        if(!isInBounds(row + 1, col))
+        {
+            return
+        }
+
+        // Current piece doesn't allow revealing bottom
+        val knownPiece = getPiece(row, col)
+        if(!knownPiece.isOpenBottom())
+        {
+            return
+        }
+
+        // The top piece is already explored, nothing to reveal
+        val piece = getPiece(row + 1, col)
+        if(piece.isExplored())
+        {
+            return
+        }
+
+        // Get a new piece and place it
+        setPiece(row+1, col, getNewPiece(row+1, col))
+    }
+
+    // Reveal the piece directly left of the current piece.
+    private fun revealLeft(row: Int, col: Int) {
+
+        // Can't reveal outside of the bounds
+        if(!isInBounds(row, col - 1))
+        {
+            return
+        }
+
+        // Current piece doesn't allow revealing left
+        val knownPiece = getPiece(row, col)
+        if(!knownPiece.isOpenLeft())
+        {
+            return
+        }
+
+        // The top piece is already explored, nothing to reveal
+        val piece = getPiece(row, col - 1)
+        if(piece.isExplored())
+        {
+            return
+        }
+
+        // Get a new piece and place it
+        setPiece(row, col - 1, getNewPiece(row, col - 1))
+    }
+
+    // Reveal the piece directly right of the current piece.
+    private fun revealRight(row: Int, col: Int) {
+
+        // Can't reveal outside of the bounds
+        if(!isInBounds(row, col + 1))
+        {
+            return
+        }
+
+        // Current piece doesn't allow revealing left
+        val knownPiece = getPiece(row, col)
+        if(!knownPiece.isOpenRight())
+        {
+            return
+        }
+
+        // The top piece is already explored, nothing to reveal
+        val piece = getPiece(row, col + 1)
+        if(piece.isExplored())
+        {
+            return
+        }
+
+        // Get a new piece and place it
+        setPiece(row, col + 1, getNewPiece(row, col + 1))
+    }
+
     private fun getNewPiece(row: Int, col: Int) : MazePiece {
         val validPieces: MutableList<MazePiece> = mutableListOf()
 
         val mustHaveOpenTop = mustHaveTopOpening(row, col)
         val cannotHaveOpenTop = cantHaveTopOpening(row, col)
 
+        val mustHaveOpenBottom = mustHaveBottomOpening(row, col)
+        val cannotHaveOpenBottom = cantHaveBottomOpening(row, col)
+
+        val mustHaveOpenLeft = mustHaveLeftOpening(row, col)
+        val cannotHaveOpenLeft = cantHaveLeftOpening(row, col)
+
+        val mustHaveOpenRight = mustHaveRightOpening(row, col)
+        val cannotHaveOpenRight = cantHaveRightOpening(row, col)
+
         for(piece in allMazePieces)
         {
             if(piece.isOpenTop() && cannotHaveOpenTop || !piece.isOpenTop() && mustHaveOpenTop) {
+                continue
+            }
+
+            if(piece.isOpenBottom() && cannotHaveOpenBottom || !piece.isOpenBottom() && mustHaveOpenBottom) {
+                continue
+            }
+
+            if(piece.isOpenLeft() && cannotHaveOpenLeft || !piece.isOpenLeft() && mustHaveOpenLeft) {
+                continue
+            }
+
+            if(piece.isOpenRight() && cannotHaveOpenRight || !piece.isOpenRight() && mustHaveOpenRight) {
                 continue
             }
 
@@ -189,6 +291,126 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
 
         // If the piece above is not open on the bottom, we are required to not have a top opening
         return !piece.isOpenBottom()
+    }
+
+    // Checks if the piece at the given coordinates must have a bottom opening
+    private fun mustHaveBottomOpening(row: Int, col: Int) : Boolean {
+
+        // You do not need a bottom opening if you are at the edge of map
+        if(!isInBounds(row+1,col))
+        {
+            return false
+        }
+
+        // If the piece is not explored, no need to force a bottom
+        val piece = getPiece(row+1,col)
+        if(!piece.isExplored())
+        {
+            return false
+        }
+
+        // If the piece below is open to the top, we are required to have a bottom opening
+        return piece.isOpenTop()
+    }
+
+    // Checks if the piece at the given coordinates can't have a bottom opening
+    private fun cantHaveBottomOpening(row: Int, col: Int) : Boolean {
+
+        // You can never go out of bounds
+        if(!isInBounds(row+1,col))
+        {
+            return true
+        }
+
+        // If the piece is not explored, not need to force no bottom
+        val piece = getPiece(row+1,col)
+        if(!piece.isExplored())
+        {
+            return false
+        }
+
+        // If the piece below is not open on the top, we are required to not have a bottom opening
+        return !piece.isOpenTop()
+    }
+
+    // Checks if the piece at the given coordinates must have a left opening
+    private fun mustHaveLeftOpening(row: Int, col: Int) : Boolean {
+
+        // You do not need a left opening if you are at the edge of map
+        if(!isInBounds(row,col-1))
+        {
+            return false
+        }
+
+        // If the piece is not explored, no need to force a left
+        val piece = getPiece(row,col-1)
+        if(!piece.isExplored())
+        {
+            return false
+        }
+
+        // If the piece to the left is open to the right, we are required to have a left opening
+        return piece.isOpenRight()
+    }
+
+    // Checks if the piece at the given coordinates can't have a left opening
+    private fun cantHaveLeftOpening(row: Int, col: Int) : Boolean {
+
+        // You can never go out of bounds
+        if(!isInBounds(row,col-1))
+        {
+            return true
+        }
+
+        // If the piece is not explored, not need to force no left
+        val piece = getPiece(row,col-1)
+        if(!piece.isExplored())
+        {
+            return false
+        }
+
+        // If the piece to the left is not open on the right, we are required to not have a left opening
+        return !piece.isOpenRight()
+    }
+
+    // Checks if the piece at the given coordinates must have a right opening
+    private fun mustHaveRightOpening(row: Int, col: Int) : Boolean {
+
+        // You do not need a right opening if you are at the edge of map
+        if(!isInBounds(row,col+1))
+        {
+            return false
+        }
+
+        // If the piece is not explored, no need to force a right
+        val piece = getPiece(row,col+1)
+        if(!piece.isExplored())
+        {
+            return false
+        }
+
+        // If the piece to the right is open to the left, we are required to have a right opening
+        return piece.isOpenLeft()
+    }
+
+    // Checks if the piece at the given coordinates can't have a right opening
+    private fun cantHaveRightOpening(row: Int, col: Int) : Boolean {
+
+        // You can never go out of bounds
+        if(!isInBounds(row,col+1))
+        {
+            return true
+        }
+
+        // If the piece is not explored, not need to force no right
+        val piece = getPiece(row,col+1)
+        if(!piece.isExplored())
+        {
+            return false
+        }
+
+        // If the piece to the right is not open on the left, we are required to not have a right opening
+        return !piece.isOpenLeft()
     }
 
     private fun isInBounds(row: Int, col: Int) : Boolean {
