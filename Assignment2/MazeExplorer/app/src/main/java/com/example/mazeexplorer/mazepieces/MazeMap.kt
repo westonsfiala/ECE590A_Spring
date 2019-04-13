@@ -39,8 +39,21 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         start()
     }
 
-    fun getCurrentPiece() : MazePiece {
-        return getPiece(playerRow, playerCol)
+    fun getCurrentPieceLocationCenter() : FloatArray {
+        val location = FloatArray(2)
+
+        if(!isInBounds(playerRow, playerCol))
+        {
+            return floatArrayOf(0.0f,0.0f)
+        }
+
+        val piece = getPiece(playerRow, playerCol)
+        val line = piece.parent as TableRow
+
+        location[0] = x + line.x + piece.x + piece.width / 2
+        location[1] = y + line.y + piece.y + piece.height / 2
+
+        return location
     }
 
     fun movePlayerUp() {

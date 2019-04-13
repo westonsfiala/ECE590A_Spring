@@ -73,29 +73,17 @@ class Maze : AppCompatActivity() {
         player.id = "Player".hashCode()
 
         background.addView(player)
+
+        // When the map is ready, perform the move player action.
+        map.post {movePlayer()}
     }
 
     private fun movePlayer() {
-        val piece = map.getCurrentPiece()
 
-        var location = IntArray(2)
+        val location = map.getCurrentPieceLocationCenter()
 
-        piece.getLocationOnScreen(location)
-
-        // Put the piece in the center of the tile.
-        // Needs to account for centering, and the map height
-        player.x = location[0].toFloat()
-        player.y = location[1].toFloat()
-
-        // For some reason the height that is returned is just a bit off.
-        // Need to do this weird correction
-        player.x += piece.width / 2.0F
-        player.y += piece.height / 2.0F - piece.height / 6.0F
-
-        player.x -= player.width / 2.0F
-        player.y += player.height / 2.0F
-
-        player.x += 0.0F
-        player.y -= map.height / 2.0F
+        // Adjust the player location to be centered in the tile
+        player.x = location[0] - player.width / 2
+        player.y = location[1] - player.height / 2
     }
 }
