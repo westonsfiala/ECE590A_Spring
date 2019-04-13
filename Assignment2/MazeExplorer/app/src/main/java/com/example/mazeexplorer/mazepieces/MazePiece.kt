@@ -1,24 +1,31 @@
 package com.example.mazeexplorer
 
+import android.content.Context
 import android.widget.ImageView
 
-interface MazePiece {
+open class MazePiece(context: Context) : ImageView(context){
 
-    fun isOpenLeft(): Boolean {
+    open fun isOpenLeft(): Boolean {
         return false
     }
 
-    fun isOpenRight(): Boolean {
+    open fun isOpenRight(): Boolean {
         return false
     }
 
-    fun isOpenTop(): Boolean {
+    open fun isOpenTop(): Boolean {
         return false
     }
 
-    fun isOpenBottom(): Boolean {
+    open fun isOpenBottom(): Boolean {
         return false
     }
 
-    fun getImageView(): ImageView
+    open fun isExplored(): Boolean {
+        return true
+    }
+
+    open fun clone(): MazePiece {
+        return MazePiece(context)
+    }
 }

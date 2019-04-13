@@ -1,22 +1,20 @@
 package com.example.mazeexplorer.mazepieces
 
 import android.content.Context
-import android.widget.ImageView
 import com.example.mazeexplorer.MazePiece
 import com.example.mazeexplorer.R
 
-class DeadendLeft(context: Context) : MazePiece {
+class DeadendLeft(context: Context) : MazePiece(context) {
 
-    private var context = context
+    init{
+        setImageResource(R.drawable.deadend_left)
+    }
 
     override fun isOpenLeft(): Boolean {
         return true
     }
 
-    override fun getImageView(): ImageView
-    {
-        var imageView = ImageView(context)
-        imageView.setImageResource(R.drawable.deadend_left)
-        return imageView
+    override fun clone(): MazePiece {
+        return DeadendLeft(context)
     }
 }

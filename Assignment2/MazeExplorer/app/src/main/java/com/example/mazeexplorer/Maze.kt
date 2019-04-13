@@ -34,7 +34,7 @@ class Maze : AppCompatActivity() {
             }
 
             override fun onSwipeBottom() {
-                map.start()
+                //map.start()
             }
         })
 

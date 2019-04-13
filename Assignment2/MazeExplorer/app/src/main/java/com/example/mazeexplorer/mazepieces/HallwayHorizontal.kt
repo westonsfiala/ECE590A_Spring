@@ -1,13 +1,14 @@
 package com.example.mazeexplorer.mazepieces
 
 import android.content.Context
-import android.widget.ImageView
 import com.example.mazeexplorer.MazePiece
 import com.example.mazeexplorer.R
 
-class HallwayHorizontal(context: Context) : MazePiece {
+class HallwayHorizontal(context: Context) : MazePiece(context) {
 
-    private var context = context
+    init {
+        setImageResource(R.drawable.hallway_horizontal)
+    }
 
     override fun isOpenLeft(): Boolean {
         return true
@@ -17,10 +18,7 @@ class HallwayHorizontal(context: Context) : MazePiece {
         return true
     }
 
-    override fun getImageView(): ImageView
-    {
-        var imageView = ImageView(context)
-        imageView.setImageResource(R.drawable.hallway_horizontal)
-        return imageView
+    override fun clone(): MazePiece {
+        return HallwayHorizontal(context)
     }
 }

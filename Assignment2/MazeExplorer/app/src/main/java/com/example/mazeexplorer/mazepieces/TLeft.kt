@@ -1,13 +1,14 @@
 package com.example.mazeexplorer.mazepieces
 
 import android.content.Context
-import android.widget.ImageView
 import com.example.mazeexplorer.MazePiece
 import com.example.mazeexplorer.R
 
-class TLeft(context: Context) : MazePiece {
+class TLeft(context: Context) : MazePiece(context) {
 
-    private var context = context
+    init {
+        setImageResource(R.drawable.t_left)
+    }
 
     override fun isOpenLeft(): Boolean {
         return true
@@ -21,10 +22,7 @@ class TLeft(context: Context) : MazePiece {
         return true
     }
 
-    override fun getImageView(): ImageView
-    {
-        var imageView = ImageView(context)
-        imageView.setImageResource(R.drawable.t_left)
-        return imageView
+    override fun clone(): MazePiece {
+        return TLeft(context)
     }
 }
