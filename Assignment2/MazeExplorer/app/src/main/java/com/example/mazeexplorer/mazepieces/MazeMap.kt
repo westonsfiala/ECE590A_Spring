@@ -44,19 +44,29 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     fun movePlayerUp() {
-        movePlayer(-1,0)
+        if(getPiece(playerRow,playerCol).isOpenTop())
+        {
+            movePlayer(-1,0)
+        }
     }
 
     fun movePlayerDown() {
-        movePlayer(1,0)
+        if(getPiece(playerRow,playerCol).isOpenBottom()) {
+            movePlayer(1, 0)
+        }
     }
 
     fun movePlayerLeft() {
-        movePlayer(0,-1)
+        if(getPiece(playerRow,playerCol).isOpenLeft()) {
+            movePlayer(0, -1)
+        }
     }
 
     fun movePlayerRight() {
-        movePlayer(0,1)
+
+        if(getPiece(playerRow,playerCol).isOpenRight()) {
+            movePlayer(0, 1)
+        }
     }
 
 
@@ -65,25 +75,7 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         playerRow += row
         playerCol += col
 
-        if(playerRow < 0)
-        {
-            playerRow = 0
-        }
-
-        if(playerRow >= rows)
-        {
-            playerRow = rows - 1
-        }
-
-        if(playerCol < 0)
-        {
-            playerCol = 0
-        }
-
-        if(playerCol >= columns)
-        {
-            playerCol = columns - 1
-        }
+        revealAdjacent(playerRow, playerCol)
     }
 
     private fun blankMap() {
