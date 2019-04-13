@@ -7,7 +7,7 @@ import com.example.mazeexplorer.R
 class TTop(context: Context) : MazePiece(context) {
 
     init {
-        setImageResource(R.drawable.t_bottom)
+        setImageResource(R.drawable.t_top)
     }
 
     override fun isOpenLeft(): Boolean {

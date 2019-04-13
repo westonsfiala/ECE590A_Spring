@@ -250,6 +250,7 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
 
         // Return a random valid piece.
         val randInt = Random.nextInt(0, validPieces.size)
+
         return validPieces[randInt]
     }
 
