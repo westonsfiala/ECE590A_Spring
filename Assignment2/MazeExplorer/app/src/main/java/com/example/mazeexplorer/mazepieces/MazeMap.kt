@@ -36,6 +36,8 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     private var goalRow = -1
     private var goalCol = -1
 
+    private var moves = 0
+
     private val startTile = Fourway(context)
     private val unexplored = Unexplored(context)
     private val goalPiece = GoalPiece(context)
@@ -67,6 +69,8 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     fun playerVictory() : Boolean {
         return playerRow == goalRow && playerCol == goalCol
     }
+
+    fun getMoves() : Int {return moves}
 
     fun getCurrentPieceLocationCenter(): FloatArray {
         val location = FloatArray(2)
@@ -110,6 +114,8 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     private fun movePlayer(row: Int, col: Int) {
+        moves++
+
         playerRow += row
         playerCol += col
 
@@ -540,43 +546,6 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
             }
 
             if(rightPiece.isExplored() && rightPiece.isOpenLeft())
-            {
-                openings++
-            }
-        }
-
-        return openings
-    }
-
-    private fun unexploredAdcacentToUnexplored(row: Int, col: Int) : Int {
-        var openings = 0
-
-        val piece = getPiece(row, col)
-
-        // Get all of the openings of an unexplored piece
-        if(!piece.isExplored())
-        {
-            val topPiece = getPiece(row-1, col)
-            val bottomPiece = getPiece(row+1, col)
-            val leftPiece = getPiece(row, col-1)
-            val rightPiece = getPiece(row, col+1)
-
-            if(!topPiece.isExplored())
-            {
-                openings++
-            }
-
-            if(!bottomPiece.isExplored())
-            {
-                openings++
-            }
-
-            if(!leftPiece.isExplored())
-            {
-                openings++
-            }
-
-            if(!rightPiece.isExplored())
             {
                 openings++
             }

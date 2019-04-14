@@ -113,7 +113,8 @@ class Maze : AppCompatActivity() {
 
         if(saveMap.map.playerVictory())
         {
-            val intent = Intent(this@Maze, MainActivity::class.java)
+            val intent = Intent(this@Maze, CongratsActivity::class.java)
+            intent.putExtra("Moves", saveMap.map.getMoves())
             startActivity(intent)
         }
     }
