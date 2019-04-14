@@ -33,8 +33,13 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     private var playerRow = 0
     private var playerCol = 0
 
+    private var goalRow = -1
+    private var goalCol = -1
+
     private val startTile = Fourway(context)
     private val unexplored = Unexplored(context)
+    private val goalPiece = GoalPiece(context)
+    private val outOfBoundsPiece = OutOfBoundsPiece(context)
 
     private val allMazePieces: Array<MazePiece> = arrayOf(
         CornerBottomLeft(context),
@@ -46,7 +51,6 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         DeadendLeft(context),
         DeadendRight(context),
         startTile,
-        GoalPiece(context),
         HallwayHorizontal(context),
         HallwayVertical(context),
         TBottom(context),
@@ -58,6 +62,10 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     init {
         blankMap()
         start()
+    }
+
+    fun playerVictory() : Boolean {
+        return playerRow == goalRow && playerCol == goalCol
     }
 
     fun getCurrentPieceLocationCenter(): FloatArray {
@@ -101,7 +109,6 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         }
     }
 
-
     private fun movePlayer(row: Int, col: Int) {
         playerRow += row
         playerCol += col
@@ -110,16 +117,12 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     private fun blankMap() {
-
-        val piece = unexplored
-
         for (row in 0 until columns) {
             val line = TableRow(context)
 
             for (col in 0 until rows) {
-                line.addView(piece.clone(), col)
+                line.addView(unexplored.clone(), col)
             }
-
             addView(line, row)
         }
     }
@@ -152,12 +155,12 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
     }
 
     // Get the piece that is placed at the the given coordinates.
-    // If out of bounds, returns unexplored
+    // If out of bounds, returns outOfBoundsPiece
     private fun getPiece(row: Int, col: Int): MazePiece {
 
-        // Return unexplored when out of bounds
+        // Return outOfBoundsPiece when out of bounds
         if (!isInBounds(row, col)) {
-            return unexplored
+            return outOfBoundsPiece
         }
 
         val line = getChildAt(row) as TableRow
@@ -283,6 +286,10 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
         val mustHaveOpenRight = mustHaveRightOpening(row, col)
         val cannotHaveOpenRight = cantHaveRightOpening(row, col)
 
+        val possibleOpenings = numPossibleTilesToFill()
+
+        val neededConnections = exploredConnectionAtUnexplored(row, col)
+
         for (piece in allMazePieces) {
             if (piece.isOpenTop() && cannotHaveOpenTop || !piece.isOpenTop() && mustHaveOpenTop) {
                 continue
@@ -300,12 +307,23 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
                 continue
             }
 
+            val pieceOpenings = piece.numOpenings()
+
+            if(possibleOpenings == 1)
+            {
+                if(pieceOpenings <= neededConnections) {
+                    continue
+                }
+            }
+
             validPieces.add(piece)
         }
 
         // If no valid pieces were found, ditch out.
         if (validPieces.size == 0) {
-            return unexplored
+            goalRow = row
+            goalCol = col
+            return goalPiece
         }
 
         // Return a random valid piece.
@@ -460,6 +478,111 @@ class MazeMap(context: Context, private val rows: Int, private val columns: Int)
 
     private fun isInBounds(row: Int, col: Int): Boolean {
         return row in 0..(rows - 1) && col in 0..(rows - 1)
+    }
+
+    private fun numPossibleTilesToFill() : Int {
+        var openings = 0
+
+        for(row in 0 until rows)
+        {
+            for(col in 0 until columns)
+            {
+                val piece = getPiece(row, col)
+
+                // When we have a unplaced tile look at all adjacent pieces for possible openings
+                if(!piece.isExplored())
+                {
+                    val topPiece = getPiece(row-1, col)
+                    val bottomPiece = getPiece(row+1, col)
+                    val leftPiece = getPiece(row, col-1)
+                    val rightPiece = getPiece(row, col+1)
+
+                    if( (topPiece.isExplored() && topPiece.isOpenBottom()) ||
+                        (bottomPiece.isExplored() && bottomPiece.isOpenTop()) ||
+                        (leftPiece.isExplored() && leftPiece.isOpenRight()) ||
+                        (rightPiece.isExplored() && rightPiece.isOpenLeft()))
+                    {
+                        openings++
+                    }
+                }
+            }
+        }
+
+        return openings
+    }
+
+    private fun exploredConnectionAtUnexplored(row: Int, col: Int) : Int {
+        var openings = 0
+
+        val piece = getPiece(row, col)
+
+        // Get all of the openings of an unexplored piece
+        if(!piece.isExplored())
+        {
+            val topPiece = getPiece(row-1, col)
+            val bottomPiece = getPiece(row+1, col)
+            val leftPiece = getPiece(row, col-1)
+            val rightPiece = getPiece(row, col+1)
+
+            if(topPiece.isExplored() && topPiece.isOpenBottom())
+            {
+                openings++
+            }
+
+            if(bottomPiece.isExplored() && bottomPiece.isOpenTop())
+            {
+                openings++
+            }
+
+            if(leftPiece.isExplored() && leftPiece.isOpenRight())
+            {
+                openings++
+            }
+
+            if(rightPiece.isExplored() && rightPiece.isOpenLeft())
+            {
+                openings++
+            }
+        }
+
+        return openings
+    }
+
+    private fun unexploredAdcacentToUnexplored(row: Int, col: Int) : Int {
+        var openings = 0
+
+        val piece = getPiece(row, col)
+
+        // Get all of the openings of an unexplored piece
+        if(!piece.isExplored())
+        {
+            val topPiece = getPiece(row-1, col)
+            val bottomPiece = getPiece(row+1, col)
+            val leftPiece = getPiece(row, col-1)
+            val rightPiece = getPiece(row, col+1)
+
+            if(!topPiece.isExplored())
+            {
+                openings++
+            }
+
+            if(!bottomPiece.isExplored())
+            {
+                openings++
+            }
+
+            if(!leftPiece.isExplored())
+            {
+                openings++
+            }
+
+            if(!rightPiece.isExplored())
+            {
+                openings++
+            }
+        }
+
+        return openings
     }
 
 }

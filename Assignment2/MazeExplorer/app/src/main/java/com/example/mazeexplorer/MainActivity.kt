@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        
+
         SmallRadio.setOnClickListener{
             setSize(smallSize)
         }

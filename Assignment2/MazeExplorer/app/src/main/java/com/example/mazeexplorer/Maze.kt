@@ -110,5 +110,11 @@ class Maze : AppCompatActivity() {
         // Adjust the player location to be centered in the tile
         player.x = location[0] - player.width / 2
         player.y = location[1] - player.height / 2
+
+        if(saveMap.map.playerVictory())
+        {
+            val intent = Intent(this@Maze, MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

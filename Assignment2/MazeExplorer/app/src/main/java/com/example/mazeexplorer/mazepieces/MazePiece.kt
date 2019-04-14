@@ -25,6 +25,32 @@ open class MazePiece(context: Context) : ImageView(context){
         return true
     }
 
+    fun numOpenings() : Int {
+        var openings = 0
+
+        if(isOpenTop())
+        {
+            openings++
+        }
+
+        if(isOpenBottom())
+        {
+            openings++
+        }
+
+        if(isOpenLeft())
+        {
+            openings++
+        }
+
+        if(isOpenRight())
+        {
+            openings++
+        }
+
+        return openings
+    }
+
     open fun clone(): MazePiece {
         return MazePiece(context)
     }
