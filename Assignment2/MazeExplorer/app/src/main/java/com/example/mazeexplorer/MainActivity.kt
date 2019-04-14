@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        
         SmallRadio.setOnClickListener{
             setSize(smallSize)
         }
@@ -36,6 +37,17 @@ class MainActivity : AppCompatActivity() {
 
         LargeRadio.setOnClickListener{
             setSize(largeSize)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(resultCode == RESULT_OK)
+        {
+            // Do something
+        }
+        else
+        {
+            // Do something else
         }
     }
 
