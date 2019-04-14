@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
         SmallRadio.setOnClickListener{
             setSize(smallSize)
         }
@@ -38,6 +37,22 @@ class MainActivity : AppCompatActivity() {
         LargeRadio.setOnClickListener{
             setSize(largeSize)
         }
+
+        if(savedInstanceState != null)
+        {
+            val savedSize = savedInstanceState.getInt("Size")
+            when (savedSize) {
+                smallSize -> SmallRadio.performClick()
+                mediumSize -> MediumRadio.performClick()
+                largeSize -> LargeRadio.performClick()
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+
+        outState?.putInt("Size", selectedSize)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
