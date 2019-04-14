@@ -8,7 +8,7 @@
         tools:context=".CongratsActivity">
 
     <TextView
-            android:text="Congrats!"
+            android:text="@string/congrats"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/CongratsText"
@@ -16,22 +16,39 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/MoveText"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" android:layout_marginTop="32dp"/>
     <TextView
-            android:text="TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/MoveText"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/CongratsText"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:layout_constraintBottom_toTopOf="@+id/BackButton"/>
+            app:layout_constraintBottom_toTopOf="@+id/BackButton" android:layout_marginTop="32dp"/>
     <Button
             android:text="@string/back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/BackButton"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/MoveText"/>
+            app:layout_constraintTop_toBottomOf="@+id/MoveText"
+            android:layout_marginTop="32dp"
+            app:layout_constraintBottom_toTopOf="@+id/PictureButton"/>
+    <ImageView
+            app:srcCompat="@android:color/transparent"
+            android:id="@+id/VictoryImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="32dp"
+            android:contentDescription="@string/todo"
+            android:layout_marginTop="8dp" app:layout_constraintTop_toBottomOf="@+id/PictureButton"
+            android:scaleType="fitXY" android:layout_width="0dp" android:layout_height="0dp"/>
+    <Button
+            android:text="@string/take_a_victory_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/PictureButton"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/BackButton"
+            android:layout_marginTop="32dp"/>
 </android.support.constraint.ConstraintLayout>

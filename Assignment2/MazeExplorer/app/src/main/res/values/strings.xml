@@ -8,7 +8,8 @@
     <string name="small">Small</string>
     <string name="medium">Medium</string>
     <string name="large">Large</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="congrats">Congrats!</string>
+    <string name="todo">TODO</string>
+    <string name="take_a_victory_picture">Take a Victory Picture</string>
 </resources>
