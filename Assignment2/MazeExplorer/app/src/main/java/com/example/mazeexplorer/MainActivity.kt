@@ -1,5 +1,6 @@
 package com.example.mazeexplorer
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -37,6 +38,14 @@ class MainActivity : AppCompatActivity() {
         LargeRadio.setOnClickListener{
             setSize(largeSize)
         }
+
+        HelpButton.text = getString(R.string.how_to_play)
+
+        HelpButton.setOnClickListener{
+            val intent = Intent(this@MainActivity, HowToPlayActivity::class.java)
+            startActivity(intent)
+        }
+
 
         if(savedInstanceState != null)
         {

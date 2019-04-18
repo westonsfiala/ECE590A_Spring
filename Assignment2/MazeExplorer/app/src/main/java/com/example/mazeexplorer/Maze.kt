@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.constraint.ConstraintSet
 import android.support.v7.app.AppCompatActivity
+import android.util.DisplayMetrics
+import android.view.Surface
 import com.example.mazeexplorer.mazepieces.Player
 import com.example.mazeexplorer.mazepieces.SaveableMazeMap
 import kotlinx.android.synthetic.main.activity_maze.*
@@ -60,6 +62,7 @@ class Maze : AppCompatActivity() {
             background.removeView(saveMap.map)
         }
 
+        // Wait till the map is created to place it nicely
         displayMaze()
         setupPlayer()
     }
@@ -87,8 +90,20 @@ class Maze : AppCompatActivity() {
         set.clone(background)
 
         set.constrainWidth(saveMap.map.id, ConstraintSet.WRAP_CONTENT)
-        set.centerVertically(saveMap.map.id, ConstraintSet.PARENT_ID)
-        set.centerHorizontally(saveMap.map.id, ConstraintSet.PARENT_ID)
+        set.connect(saveMap.map.id, ConstraintSet.TOP, background.id, ConstraintSet.TOP)
+
+        // If the When the screen is rotated we can't waste vertical space
+        if(windowManager.defaultDisplay.rotation == Surface.ROTATION_0) {
+            set.connect(saveMap.map.id, ConstraintSet.LEFT, background.id, ConstraintSet.LEFT)
+            set.connect(saveMap.map.id, ConstraintSet.RIGHT, background.id, ConstraintSet.RIGHT)
+            set.connect(saveMap.map.id, ConstraintSet.BOTTOM, ReturnButton.id, ConstraintSet.TOP)
+        }
+        else
+        {
+            set.connect(saveMap.map.id, ConstraintSet.LEFT, ReturnButton.id, ConstraintSet.RIGHT)
+            set.connect(saveMap.map.id, ConstraintSet.RIGHT, background.id, ConstraintSet.RIGHT)
+            set.connect(saveMap.map.id, ConstraintSet.BOTTOM, background.id, ConstraintSet.BOTTOM)
+        }
 
         set.applyTo(background)
     }
