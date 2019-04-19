@@ -1,12 +1,14 @@
 package com.example.mazeexplorer
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.content.FileProvider
+import android.view.Surface
 import kotlinx.android.synthetic.main.activity_congrats.*
 import java.io.File
 import java.io.IOException
@@ -17,17 +19,25 @@ class CongratsActivity : AppCompatActivity() {
 
     private var mPhotoFile: File? = null
 
-    private lateinit var mCurrentPhotoPath: String
+    private var mCurrentPhotoPath: String? = null
     private val requestTakePhoto = 1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_congrats)
 
         val moves = intent.getIntExtra("Moves", 0)
+        val pic = intent.getStringExtra("photo")
 
         MoveText.text = "You finished the maze in $moves moves"
+
+        if(pic != null)
+        {
+            mCurrentPhotoPath = pic
+            setPic()
+        }
 
         BackButton.setOnClickListener {
             val intent = Intent(this@CongratsActivity, MainActivity::class.java)
@@ -55,6 +65,15 @@ class CongratsActivity : AppCompatActivity() {
                     startActivityForResult(takePictureIntent, requestTakePhoto)
                 }
             }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+
+        if(mCurrentPhotoPath != null)
+        {
+            intent.putExtra("photo", mCurrentPhotoPath)
         }
     }
 
