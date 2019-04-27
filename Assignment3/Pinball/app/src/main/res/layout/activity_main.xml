@@ -40,10 +40,11 @@
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp" android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/pauseButton"/>
-    <ImageButton
+    <fragment
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_lock_silent_mode"
-            android:id="@+id/musicButton"
-            app:layout_constraintStart_toEndOf="@+id/pauseButton"
-            android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"/>
+            android:layout_height="wrap_content" android:name="com.example.pinball.MusicFragment"
+            android:id="@+id/musicFragment"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toEndOf="@+id/pauseButton"
+    />
 </android.support.constraint.ConstraintLayout>

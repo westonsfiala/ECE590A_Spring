@@ -10,7 +10,6 @@ import android.hardware.SensorManager
 import android.hardware.SensorEvent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.media.MediaPlayer
 import android.support.v7.app.AlertDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.Math.pow
@@ -21,11 +20,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     // Accelerometer variables
     private var mSensorManager : SensorManager ?= null
     private var mAccelerometer : Sensor ?= null
-
-    // Music Player variables
-    private lateinit var mMusicPlayer : MediaPlayer
-    private var position = 0
-    private var musicPlaying = true
 
     // variables for how often to run the bouncing ball thread
     private lateinit var bounceThread : Thread
@@ -47,7 +41,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         // Set up all the sub-functions
         readIntent(intent)
         setupAccelerometer()
-        setupMusic()
         setupDisplaySize()
         setupButtons()
         setupBouncingBall()
@@ -55,8 +48,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        mMusicPlayer.stop()
 
         runThreads = false
     }
@@ -71,13 +62,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         // focus in accelerometer
         mAccelerometer = mSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-    }
-
-    private fun setupMusic() {
-        mMusicPlayer = MediaPlayer.create(this, R.raw.creativeminds)
-        mMusicPlayer.start()
-        mMusicPlayer.isLooping = true
-
     }
 
     private fun setupDisplaySize() {
@@ -104,6 +88,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             isRunning = !isRunning
         }
 
+        /*
         musicButton.setOnClickListener {
             if(musicPlaying)
             {
@@ -117,6 +102,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             }
             musicPlaying = !musicPlaying
         }
+        */
     }
 
     private fun setupBouncingBall() {
@@ -252,31 +238,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         super.onResume()
         mSensorManager!!.registerListener(this,mAccelerometer,
             SensorManager.SENSOR_DELAY_GAME)
-
-        if(musicPlaying)
-        {
-            playMusic()
-        }
     }
 
     override fun onPause() {
         super.onPause()
         mSensorManager!!.unregisterListener(this)
-
-        if(musicPlaying)
-        {
-            pauseMusic()
-        }
-    }
-
-    private fun pauseMusic() {
-        position = mMusicPlayer.currentPosition
-        mMusicPlayer.pause()
-    }
-
-    private fun playMusic() {
-        position = mMusicPlayer.currentPosition
-        mMusicPlayer.seekTo(position)
-        mMusicPlayer.start()
     }
 }
