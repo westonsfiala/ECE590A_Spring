@@ -8,24 +8,37 @@ import kotlinx.android.synthetic.main.activity_setup.*
 
 class SetupActivity : AppCompatActivity() {
 
+    var scores : ArrayList<Int> ?= null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
 
-        // Force that we have a
+        // Force that we have a good orientation
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
+        scores = intent.getIntegerArrayListExtra("scores")
 
         easyButton.performClick()
 
         startButton.setOnClickListener {
-            var intent = Intent(this, MainActivity::class.java)
+            val gameIntent = Intent(this, MainActivity::class.java)
 
             when {
-                easyButton.isChecked -> intent.putExtra("velocity", 10f)
-                mediumButton.isChecked -> intent.putExtra("velocity", 20f)
-                else -> intent.putExtra("velocity", 30f)
+                easyButton.isChecked -> gameIntent.putExtra("velocity", 10f)
+                mediumButton.isChecked -> gameIntent.putExtra("velocity", 20f)
+                else -> gameIntent.putExtra("velocity", 30f)
             }
+
+            gameIntent.putIntegerArrayListExtra("scores", scores)
+
+            startActivity(gameIntent)
+        }
+
+        scoreButton.setOnClickListener {
+            val intent = Intent(this, ScoreActivity::class.java)
+
+            intent.putIntegerArrayListExtra("scores", scores)
 
             startActivity(intent)
         }

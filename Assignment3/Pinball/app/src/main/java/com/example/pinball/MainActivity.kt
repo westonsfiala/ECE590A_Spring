@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
     // Users score
     private var score = 0
+    private var scores : ArrayList<Int> ?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
     private fun readIntent(intent: Intent) {
         yVelocity = intent.getFloatExtra("velocity", 10f)
-
+        scores = intent.getIntegerArrayListExtra("scores")
     }
 
     private fun setupAccelerometer() {
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private fun setupButtons() {
         exitButton.setOnClickListener {
             val exitIntent = Intent(this@MainActivity, SetupActivity::class.java)
+            exitIntent.putIntegerArrayListExtra("scores", scores)
             startActivity(exitIntent)
         }
 
@@ -87,22 +89,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
             isRunning = !isRunning
         }
-
-        /*
-        musicButton.setOnClickListener {
-            if(musicPlaying)
-            {
-                musicButton.setImageResource(android.R.drawable.ic_lock_silent_mode_off)
-                pauseMusic()
-            }
-            else
-            {
-                musicButton.setImageResource(android.R.drawable.ic_lock_silent_mode)
-                playMusic()
-            }
-            musicPlaying = !musicPlaying
-        }
-        */
     }
 
     private fun setupBouncingBall() {
@@ -180,7 +166,16 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             }
 
             val intent = Intent(this, SetupActivity::class.java)
-            intent.putExtra("endingScore", score)
+            if(scores != null)
+            {
+                scores!!.add(score)
+            }
+            else
+            {
+                scores = ArrayList(1)
+                scores!!.add(score)
+            }
+            intent.putIntegerArrayListExtra("scores", scores)
             startActivity(intent)
         }
 
