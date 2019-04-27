@@ -1,33 +1,69 @@
 package com.example.pinball
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Point
 import android.hardware.Sensor
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.hardware.SensorEvent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.view.Window
-import android.view.WindowManager
+import android.media.MediaPlayer
+import android.support.v7.app.AlertDialog
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.Math.pow
+import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity() , SensorEventListener {
 
-    private var mSensorManager : SensorManager?= null
-    private var mAccelerometer : Sensor?= null
+    // Accelerometer variables
+    private var mSensorManager : SensorManager ?= null
+    private var mAccelerometer : Sensor ?= null
 
-    var isRunning = true
+    // Music Player variables
+    private lateinit var mMusicPlayer : MediaPlayer
+    private var position = 0
+    private var musicPlaying = true
+
+    // variables for how often to run the bouncing ball thread
+    private lateinit var bounceThread : Thread
+    private val sleepTime : Long = 1000/60
+    private var yVelocity = 10f
+    private val startingXVelocity = 10f
+
+    // If the game is paused or not
+    private var runThreads = true
+    private var isRunning = true
+
+    // Users score
+    private var score = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Set up all the sub-functions
+        readIntent(intent)
         setupAccelerometer()
+        setupMusic()
         setupDisplaySize()
+        setupButtons()
         setupBouncingBall()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        mMusicPlayer.stop()
+
+        runThreads = false
+    }
+
+    private fun readIntent(intent: Intent) {
+        yVelocity = intent.getFloatExtra("velocity", 10f)
+
     }
 
     private fun setupAccelerometer() {
@@ -35,48 +71,161 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         // focus in accelerometer
         mAccelerometer = mSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        // setup the window
+    }
+
+    private fun setupMusic() {
+        mMusicPlayer = MediaPlayer.create(this, R.raw.creativeminds)
+        mMusicPlayer.start()
+        mMusicPlayer.isLooping = true
+
     }
 
     private fun setupDisplaySize() {
+        // Force that we have a
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
 
+    private fun setupButtons() {
+        exitButton.setOnClickListener {
+            val exitIntent = Intent(this@MainActivity, SetupActivity::class.java)
+            startActivity(exitIntent)
+        }
+
+        pauseButton.setOnClickListener {
+            if(isRunning)
+            {
+                pauseButton.setImageResource(android.R.drawable.ic_media_play)
+            }
+            else
+            {
+                pauseButton.setImageResource(android.R.drawable.ic_media_pause)
+            }
+
+            isRunning = !isRunning
+        }
+
+        musicButton.setOnClickListener {
+            if(musicPlaying)
+            {
+                musicButton.setImageResource(android.R.drawable.ic_lock_silent_mode_off)
+                pauseMusic()
+            }
+            else
+            {
+                musicButton.setImageResource(android.R.drawable.ic_lock_silent_mode)
+                playMusic()
+            }
+            musicPlaying = !musicPlaying
+        }
     }
 
     private fun setupBouncingBall() {
-        Thread {
+        bounceThread = Thread {
             greenBall.x = 0f
             greenBall.y = 0f
 
-            var xVelocity = 10f
-            var yVelocity = 10f
+            var xVelocity = startingXVelocity
 
-            while(isRunning)
-            {
-                greenBall.x += xVelocity
-                greenBall.y += yVelocity
+            while(runThreads) {
+                if (isRunning) {
+                    runOnUiThread {
 
-                if(greenBall.x < background.left || greenBall.x + greenBall.width > background.right)
-                {
-                    xVelocity *= -1f
-                }
+                        if (checkCollision() && yVelocity > 0) {
+                            yVelocity *= -1f
 
-                if(greenBall.y < background.top || greenBall.y + greenBall.height > background.bottom)
-                {
-                    yVelocity *= -1f
+                            val xMismatch = redBall.x - greenBall.x
+
+                            if(xMismatch > redBall.width/2 && xVelocity > 0)
+                            {
+                                xVelocity *= -1f
+                                xVelocity -= 2
+                            }
+
+                            if(xMismatch < -redBall.width/2 && xVelocity < 0)
+                            {
+                                xVelocity *= -1f
+                                xVelocity += 2
+                            }
+
+                            score++
+                        }
+
+                        if (greenBall.x < background.left || greenBall.x + greenBall.width > background.right) {
+                            xVelocity *= -1f
+                        }
+
+                        if (greenBall.y < background.top) {
+                            if(xVelocity > startingXVelocity)
+                            {
+                                xVelocity--
+                            }
+                            else if (xVelocity < -startingXVelocity)
+                            {
+                                xVelocity++
+                            }
+
+                            yVelocity *= -1f
+                        }
+
+                        if (greenBall.y + greenBall.height > background.bottom) {
+                            // Game over.
+                            isRunning = false
+
+                            val mDialog = AlertDialog.Builder(this)
+                            mDialog.setTitle("Game Over")
+                            val text = String.format("You scored %d points!", score)
+                            mDialog.setMessage(text)
+                            mDialog.setPositiveButton("OK") { _, _ -> }
+                            mDialog.setOnDismissListener {
+                                runThreads = false
+                            }
+                            mDialog.show()
+                        }
+
+                        greenBall.x += xVelocity
+                        greenBall.y += yVelocity
+
+                        scoreText.text = String.format("Score = %d", score)
+                    }
                 }
 
                 // Shoot for 60fps
-                Thread.sleep(1000/60)
+                Thread.sleep(sleepTime)
             }
-        }.start()
+
+            val intent = Intent(this, SetupActivity::class.java)
+            intent.putExtra("endingScore", score)
+            startActivity(intent)
+        }
+
+        bounceThread.start()
+    }
+
+    private fun checkCollision() : Boolean
+    {
+        val redCenter = Point()
+
+        redCenter.x = redBall.x.toInt() + redBall.width/2
+        redCenter.y = redBall.y.toInt() + redBall.height/2
+
+        val greenCenter = Point()
+
+        greenCenter.x = greenBall.x.toInt() + greenBall.width/2
+        greenCenter.y = greenBall.y.toInt() + greenBall.height/2
+
+        val xDist = pow(redCenter.x - greenCenter.x.toDouble(), 2.toDouble())
+        val yDist = pow(redCenter.y - greenCenter.y.toDouble(), 2.toDouble())
+
+        val distance =  sqrt(xDist+yDist)
+
+        return distance < (redBall.width + greenBall.width) / 2
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if (event != null) {
+        if (event != null && isRunning) {
             val xAxis = event.values[0]
 
             var xDoubled = xAxis * xAxis
@@ -103,10 +252,31 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         super.onResume()
         mSensorManager!!.registerListener(this,mAccelerometer,
             SensorManager.SENSOR_DELAY_GAME)
+
+        if(musicPlaying)
+        {
+            playMusic()
+        }
     }
 
     override fun onPause() {
         super.onPause()
         mSensorManager!!.unregisterListener(this)
+
+        if(musicPlaying)
+        {
+            pauseMusic()
+        }
+    }
+
+    private fun pauseMusic() {
+        position = mMusicPlayer.currentPosition
+        mMusicPlayer.pause()
+    }
+
+    private fun playMusic() {
+        position = mMusicPlayer.currentPosition
+        mMusicPlayer.seekTo(position)
+        mMusicPlayer.start()
     }
 }

@@ -11,11 +11,39 @@
             android:layout_height="wrap_content" app:srcCompat="@drawable/ball"
             android:id="@+id/redBall"
             app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
-    />
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp" android:layout_marginRight="8dp"/>
     <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" app:srcCompat="@drawable/ball2"
             android:id="@+id/greenBall" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
     />
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/scoreText" android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+    />
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_media_pause"
+            android:id="@+id/pauseButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/exitButton"
+            android:layout_marginTop="8dp"/>
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_delete"
+            android:id="@+id/exitButton"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp" android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/pauseButton"/>
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_lock_silent_mode"
+            android:id="@+id/musicButton"
+            app:layout_constraintStart_toEndOf="@+id/pauseButton"
+            android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"/>
 </android.support.constraint.ConstraintLayout>
