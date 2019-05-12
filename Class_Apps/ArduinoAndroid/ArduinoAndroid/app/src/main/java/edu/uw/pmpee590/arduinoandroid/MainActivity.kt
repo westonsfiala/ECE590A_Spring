@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity(), BLE.Callback {
     }
 
     companion object {
-        private val DEVICE_NAME = "PMP590 is awesome"
+        private val DEVICE_NAME = "Weston_BLE_Arduino"
         private val REQUEST_ENABLE_BT = 0
     }
 }

@@ -1,4 +1,4 @@
-package edu.uw.pmpee590.arduinoandroid
+package com.example.bluetoothtimer
 
 
 
