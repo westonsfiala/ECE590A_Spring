@@ -28,23 +28,21 @@ class ColorSelectorFragment : Fragment(), SeekBar.OnSeekBarChangeListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        colorPreview.setColorFilter(Color.argb(255, redValue, greenValue, blueValue))
-
-        RedScroll.setOnSeekBarChangeListener(this)
-        GreenScroll.setOnSeekBarChangeListener(this)
-        BlueScroll.setOnSeekBarChangeListener(this)
-
         // Weird hack so that the progress gets updated. Had to find it online.
+        // https://stackoverflow.com/questions/9792888/android-seekbar-set-progress-value
         RedScroll.max = 0
         RedScroll.max = 255
+        RedScroll.setOnSeekBarChangeListener(this)
         RedScroll.progress = Random.nextInt(0, 255)
 
         GreenScroll.max = 0
         GreenScroll.max = 255
+        GreenScroll.setOnSeekBarChangeListener(this)
         GreenScroll.progress = Random.nextInt(0, 255)
 
         BlueScroll.max = 0
         BlueScroll.max = 255
+        BlueScroll.setOnSeekBarChangeListener(this)
         BlueScroll.progress = Random.nextInt(0, 255)
     }
 

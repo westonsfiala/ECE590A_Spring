@@ -14,41 +14,97 @@
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp" android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
+            android:layout_marginStart="8dp" android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_constraintBottom_toTopOf="@+id/TimerDurationText" android:layout_marginBottom="8dp"/>
     <SeekBar
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:max="60"
+            android:max="50"
             android:progress="10"
             android:id="@+id/TimerDurationSlider"
             app:layout_constraintTop_toBottomOf="@+id/TimerDurationText"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
             android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp" android:layout_marginLeft="8dp"/>
+            android:layout_marginStart="8dp" android:layout_marginLeft="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/StartColorText" android:layout_marginBottom="8dp"/>
     <TextView
-            android:text="Timer Duration (Seconds)"
+            android:text="Timer Duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/TimerDurationText"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" android:layout_marginTop="128dp"
-            app:layout_constraintTop_toBottomOf="@+id/GreetingText" android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="8dp" android:layout_marginStart="8dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/GreetingText"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/TimerDurationSlider"/>
     <TextView
-            android:text="Starting Color"
+            android:text="Starting LED Color"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/StartColorText"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_constraintTop_toBottomOf="@+id/TimerDurationSlider" android:layout_marginTop="100dp"
+            app:layout_constraintTop_toBottomOf="@+id/TimerDurationSlider" android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="8dp"
             android:layout_marginStart="8dp" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="8dp"/>
+            android:layout_marginLeft="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/StartingColorFragment"/>
     <fragment
             android:layout_width="0dp"
             android:layout_height="wrap_content" android:name="com.example.bluetoothtimer.ColorSelectorFragment"
-            android:id="@+id/fragment"
+            android:id="@+id/StartingColorFragment"
             app:layout_constraintTop_toBottomOf="@+id/StartColorText" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="8dp" android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp" android:layout_marginRight="8dp"/>
+            android:layout_marginEnd="8dp" android:layout_marginRight="8dp" android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/EndingColorText"/>
+    <TextView
+            android:text="Ending LED Color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/EndingColorText"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintTop_toBottomOf="@+id/StartingColorFragment" android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="8dp" app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintBottom_toTopOf="@+id/EndingColorFragment"/>
+    <fragment
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" android:name="com.example.bluetoothtimer.ColorSelectorFragment"
+            android:id="@+id/EndingColorFragment"
+            app:layout_constraintTop_toBottomOf="@+id/EndingColorText" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="8dp" android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp" android:layout_marginRight="8dp" android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/BuzzSwitch"/>
+    <Switch
+            android:text="Buzz On Timer End"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/BuzzSwitch"
+            app:layout_constraintTop_toBottomOf="@+id/EndingColorFragment" android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp" android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/TempText"/>
+    <TextView
+            android:text="Temp on Arduino = Unknown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/TempText"
+            app:layout_constraintTop_toBottomOf="@+id/BuzzSwitch" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp" app:layout_constraintHorizontal_bias="0.497"
+            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/RunTimerButton"/>
+    <Button
+            android:text="Run Timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/RunTimerButton" android:layout_marginEnd="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/TempText"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="8dp"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp" android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="8dp"/>
 </android.support.constraint.ConstraintLayout>
