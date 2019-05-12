@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.widget.SeekBar
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.Callback {
 
@@ -22,6 +23,10 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
     private var startedScan = false
     private var destroyThread = false
 
+    private var updatingConfig = false
+    private var gotOK = false
+    private var boardTemp = 0
+
     private var ble: BLE? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +34,8 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
         setContentView(R.layout.activity_main)
 
         setupTimerSlider()
+        setupRunTimerButton()
+        setupUpdateConfigButton()
         setupBLE()
         startReaderThread()
     }
@@ -45,6 +52,20 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
         TimerDurationSlider.max = 0
         TimerDurationSlider.max = 50
         TimerDurationSlider.progress = 0
+    }
+
+    private fun setupRunTimerButton()
+    {
+        RunTimerButton.setOnClickListener {
+            startTimer()
+        }
+    }
+
+    private fun setupUpdateConfigButton()
+    {
+        UpdateConfigButton.setOnClickListener {
+            updateConfig()
+        }
     }
 
     private fun setupBLE()
@@ -83,12 +104,15 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
                     } else {
                         RunTimerButton.isEnabled = true
 
-                        requestTemp()
-
-                        updateConfig()
+                        if(!updatingConfig)
+                        {
+                            requestTemp()
+                            ReadbackText.text = "Arduino Temp = $boardTemp"
+                        }
                     }
                 }
-                Thread.sleep(1000)
+                // Don't need to run this that often. Only do it every 10 seconds.
+                Thread.sleep(10000)
             }
         }
 
@@ -98,15 +122,35 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
     private fun requestTemp()
     {
         // Ask for the temp
-        ble!!.send("readtemp")
+        ble!!.send("TEMP")
+    }
+
+    private fun waitForOK() : Boolean
+    {
+        var loop = 0
+        while(!gotOK && loop < 20)
+        {
+            Thread.sleep(100)
+            loop++
+        }
+
+        return gotOK
     }
 
     private fun updateConfig()
     {
+        updatingConfig = true
         // Send the current configuration that the use has set.
+
+        gotOK = false
 
         // length of the timer
         ble!!.send("TIMER $timerRuntime")
+
+        if(!waitForOK())
+        {
+            ReadbackText.text = "Failed to Get OK"
+        }
 
         // LED color to start from
         val starter = StartingColorFragment as ColorSelectorFragment
@@ -115,31 +159,53 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
         val greenStart = starter.greenValue
         val blueStart = starter.blueValue
 
-        ble!!.send("START_COLOR $redStart $greenStart $blueStart")
+        gotOK = false
+
+        ble!!.send("COLOR1 $redStart $greenStart $blueStart")
+
+        if(!waitForOK())
+        {
+            ReadbackText.text = "Failed to Get OK"
+        }
 
         // LED color to end with
-        val ender = StartingColorFragment as ColorSelectorFragment
+        val ender = EndingColorFragment as ColorSelectorFragment
 
         val redEnd = ender.redValue
         val greenEnd = ender.greenValue
         val blueEnd = ender.blueValue
 
-        ble!!.send("END_COLOR $redEnd $greenEnd $blueEnd")
+        gotOK = false
+
+        ble!!.send("COLOR2 $redEnd $greenEnd $blueEnd")
+
+        if(!waitForOK())
+        {
+            ReadbackText.text = "Failed to Get OK"
+        }
 
         // If the device should buzz at the end
         var buzz = 0
-        if(BuzzSwitch.isChecked)
-        {
+        if (BuzzSwitch.isChecked) {
             buzz = 1
         }
 
+        gotOK = false
+
         ble!!.send("BUZZ $buzz")
+
+        if(!waitForOK())
+        {
+            ReadbackText.text = "Failed to Get OK"
+        }
+
+        updatingConfig = false
     }
 
     private fun startTimer()
     {
         updateConfig()
-        ble!!.send("START_TIMER")
+        ble!!.send("RUNTIMER")
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int,
@@ -201,8 +267,6 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
         Log.i("BLE", "Connected!")
         connected = true
         startedScan = false
-        ReadbackText.text = "Connected to bluetooth device"
-
     }
 
     /**
@@ -222,7 +286,6 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
         Log.i("BLE", "Disconnected!")
         connected = false
         startedScan = false
-        ReadbackText.text = "Disconnected from bluetooth device"
     }
 
     /**
@@ -238,8 +301,17 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
         when
         {
             recieved.startsWith("TEMP") -> {
-                val temp = recieved.substring("TEMP".length + 1)
-                ReadbackText.text = "Arduino Temp = $temp"
+                try {
+                    val temp = recieved.substring("TEMP".length + 1)
+                    boardTemp = temp.toInt()
+                } catch (e:Exception)
+                {
+
+                }
+            }
+            recieved.startsWith("OK") ->
+            {
+                gotOK = true
             }
         }
     }

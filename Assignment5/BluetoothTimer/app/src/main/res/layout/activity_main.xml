@@ -92,19 +92,29 @@
             android:layout_height="wrap_content"
             android:id="@+id/ReadbackText"
             app:layout_constraintTop_toBottomOf="@+id/BuzzSwitch" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp" app:layout_constraintHorizontal_bias="0.497"
-            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/RunTimerButton"/>
+            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/RunTimerButton"
+            android:textAlignment="center"/>
     <Button
             android:text="Run Timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/RunTimerButton" android:layout_marginEnd="8dp"
             app:layout_constraintTop_toBottomOf="@+id/ReadbackText"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="8dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="8dp"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="8dp"
+            app:layout_constraintStart_toEndOf="@+id/UpdateConfigButton"/>
+    <Button
+            android:text="Update Config"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/UpdateConfigButton" app:layout_constraintEnd_toStartOf="@+id/RunTimerButton"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp"
+            app:layout_constraintTop_toTopOf="@+id/RunTimerButton"
+            app:layout_constraintBottom_toBottomOf="@+id/RunTimerButton"/>
 </android.support.constraint.ConstraintLayout>
