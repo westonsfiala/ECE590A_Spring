@@ -33,9 +33,9 @@ int start_red = 0;
 int start_green = 0;
 int start_blue = 0;
 
-int end_red = 0;
-int end_green = 0;
-int end_blue = 0;
+int end_red = 255;
+int end_green = 255;
+int end_blue = 255;
 
 bool buzz_at_end = false;
 
@@ -162,20 +162,68 @@ void loop(void)
     delay(100);
   }
 
-  if(recievedText.startsWith(start_timer)){
+  bool runTimer = false;
+
+  if(recievedText.startsWith(start_timer))
+  {
+    ble.print("OK");
+    Serial.println("Bluetooth started timer");
+    runTimer = true;
+  }
+
+  if(CircuitPlayground.rightButton())
+  {
+    Serial.println("Right button started timer");
+    runTimer = true;
+  }
+
+  if(runTimer){
+    runTimer = false;
+    
+    CircuitPlayground.clearPixels();
+    
     for(int i = 0; i < 10; ++i)
     {
       float endBias = i/9.0;
-      float startBias = 1.0 - startBias;
+      float startBias = 1.0 - endBias;
       
       float red = (start_red * startBias) + (end_red * endBias);
       float green = (start_green * startBias) + (end_green * endBias);
       float blue = (start_blue * startBias) + (end_blue * endBias);
       
       CircuitPlayground.setPixelColor(i, (char)red, (char)green, (char)blue);
+
+      int delayTime = timer_length * 100;
+
+      Serial.println("Sleeping for " + String(delayTime));
+
+      delay(delayTime);
     }
 
-    ble.print("OK");
+    if(buzz_at_end)
+    {
+      CircuitPlayground.playTone(500,500,false);
+    }
+
+    // Blink 1
+    CircuitPlayground.clearPixels();
+    delay(100);
+    for (int i = 0; i < 10; ++i)
+    {
+      CircuitPlayground.setPixelColor(i, CircuitPlayground.colorWheel(25 * i));
+    }
+    delay(100);
+
+    // Blink 2
+    CircuitPlayground.clearPixels();
+    delay(100);
+    for (int i = 0; i < 10; ++i)
+    {
+      CircuitPlayground.setPixelColor(i, CircuitPlayground.colorWheel(25 * i));
+    }
+    delay(100);
+    
+    CircuitPlayground.clearPixels();
   }
   else if(recievedText.startsWith(temp)){
     sensorTemp = CircuitPlayground.temperature(); // returns a floating point number in Centigrade
@@ -185,7 +233,6 @@ void loop(void)
     char output[8];
     String data = temp + " ";
     data += sensorTemp;
-    Serial.println(data);
     data.toCharArray(output,8);
     ble.print(data);
   }

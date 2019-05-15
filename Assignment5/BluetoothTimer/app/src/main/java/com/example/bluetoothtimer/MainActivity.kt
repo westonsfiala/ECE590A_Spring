@@ -15,7 +15,6 @@ import java.lang.Exception
 
 class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.Callback {
 
-    var timerRuntime = 10
 
     // variables for how often to run the bouncing ball thread
     private lateinit var readerThread : Thread
@@ -23,11 +22,21 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
     private var startedScan = false
     private var destroyThread = false
 
-    private var updatingConfig = false
+    private var startTheTimer = false
+
     private var gotOK = false
     private var boardTemp = 0
 
     private var ble: BLE? = null
+
+    private var timerRuntime = 10
+    private var lastTimerRuntime = -1
+
+    private var lastStartColor = arrayOf(-1, -1, -1)
+
+    private var lastEndColor = arrayOf(-1, -1, -1)
+
+    private var lastBuzz = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +44,6 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
 
         setupTimerSlider()
         setupRunTimerButton()
-        setupUpdateConfigButton()
         setupBLE()
         startReaderThread()
     }
@@ -57,14 +65,7 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
     private fun setupRunTimerButton()
     {
         RunTimerButton.setOnClickListener {
-            startTimer()
-        }
-    }
-
-    private fun setupUpdateConfigButton()
-    {
-        UpdateConfigButton.setOnClickListener {
-            updateConfig()
+            startTheTimer = true
         }
     }
 
@@ -94,64 +95,93 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
         readerThread = Thread {
 
             while (!destroyThread) {
-                runOnUiThread {
-                    if (!connected) {
-                        if (!startedScan) {
-                            startScan()
-                        }
-
-                        RunTimerButton.isEnabled = false
-                    } else {
-                        RunTimerButton.isEnabled = true
-
-                        if(!updatingConfig)
-                        {
-                            requestTemp()
-                            ReadbackText.text = "Arduino Temp = $boardTemp"
-                        }
+                if (!connected) {
+                    if (!startedScan) {
+                        resetStored()
+                        startScan()
                     }
+
+                    runOnUiThread {
+                        RunTimerButton.isEnabled = false
+                    }
+                } else {
+                    runOnUiThread {
+                        RunTimerButton.isEnabled = true
+                    }
+
+                    if(startTheTimer)
+                    {
+                        startTimer()
+                        startTheTimer = false
+                    }
+                    requestTemp()
+                    updateConfig()
                 }
-                // Don't need to run this that often. Only do it every 10 seconds.
-                Thread.sleep(10000)
+                // Don't need to run this that often. Only do it every 1 second.
+                Thread.sleep(1000)
             }
         }
 
         readerThread.start()
     }
 
-    private fun requestTemp()
+    private fun resetStored()
     {
-        // Ask for the temp
-        ble!!.send("TEMP")
+       lastTimerRuntime = -1
+
+        lastStartColor = arrayOf(-1, -1, -1)
+
+        lastEndColor = arrayOf(-1, -1, -1)
+
+        lastBuzz = -1
     }
 
-    private fun waitForOK() : Boolean
+    private fun requestTemp()
     {
+        sendCommand("TEMP")
+    }
+
+    private fun sendCommand(command : String)
+    {
+        gotOK = false
+
+        ble!!.send(command)
+
         var loop = 0
         while(!gotOK && loop < 20)
         {
             Thread.sleep(100)
             loop++
         }
-
-        return gotOK
     }
 
     private fun updateConfig()
     {
-        updatingConfig = true
         // Send the current configuration that the use has set.
+        updateTimerLength()
+        updateStartColor()
+        updateEndColor()
+        updateBuzz()
+    }
 
-        gotOK = false
+    private fun updateTimerLength()
+    {
+        val timerSnapshot = timerRuntime
 
-        // length of the timer
-        ble!!.send("TIMER $timerRuntime")
-
-        if(!waitForOK())
+        // Timer is out of date
+        if(lastTimerRuntime != timerSnapshot)
         {
-            ReadbackText.text = "Failed to Get OK"
-        }
+            sendCommand("TIMER $timerSnapshot")
 
+            if(gotOK)
+            {
+                lastTimerRuntime = timerSnapshot
+            }
+        }
+    }
+
+    private fun updateStartColor()
+    {
         // LED color to start from
         val starter = StartingColorFragment as ColorSelectorFragment
 
@@ -159,15 +189,23 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
         val greenStart = starter.greenValue
         val blueStart = starter.blueValue
 
-        gotOK = false
+        val startColorSnapshot = arrayOf(redStart, greenStart, blueStart)
 
-        ble!!.send("COLOR1 $redStart $greenStart $blueStart")
-
-        if(!waitForOK())
+        if(lastStartColor[0] != startColorSnapshot[0] ||
+            lastStartColor[1] != startColorSnapshot[1] ||
+            lastStartColor[2] != startColorSnapshot[2])
         {
-            ReadbackText.text = "Failed to Get OK"
-        }
+            sendCommand("COLOR1 $redStart $greenStart $blueStart")
 
+            if(gotOK)
+            {
+                lastStartColor = startColorSnapshot
+            }
+        }
+    }
+
+    private fun updateEndColor()
+    {
         // LED color to end with
         val ender = EndingColorFragment as ColorSelectorFragment
 
@@ -175,37 +213,43 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
         val greenEnd = ender.greenValue
         val blueEnd = ender.blueValue
 
-        gotOK = false
+        val endColorSnapshot = arrayOf(redEnd, greenEnd, blueEnd)
 
-        ble!!.send("COLOR2 $redEnd $greenEnd $blueEnd")
-
-        if(!waitForOK())
+        if(lastEndColor[0] != endColorSnapshot[0] ||
+            lastEndColor[1] != endColorSnapshot[1] ||
+            lastEndColor[2] != endColorSnapshot[2])
         {
-            ReadbackText.text = "Failed to Get OK"
-        }
+            sendCommand("COLOR2 $redEnd $greenEnd $blueEnd")
 
-        // If the device should buzz at the end
-        var buzz = 0
+            if(gotOK)
+            {
+                lastEndColor = endColorSnapshot
+            }
+        }
+    }
+
+    private fun updateBuzz()
+    {
+        var buzzSnapshot = 0
         if (BuzzSwitch.isChecked) {
-            buzz = 1
+            buzzSnapshot = 1
         }
 
-        gotOK = false
-
-        ble!!.send("BUZZ $buzz")
-
-        if(!waitForOK())
+        if(lastBuzz != buzzSnapshot)
         {
-            ReadbackText.text = "Failed to Get OK"
-        }
+            sendCommand("BUZZ $buzzSnapshot")
 
-        updatingConfig = false
+            if(gotOK)
+            {
+                lastBuzz = buzzSnapshot
+            }
+        }
     }
 
     private fun startTimer()
     {
         updateConfig()
-        ble!!.send("RUNTIMER")
+        sendCommand("RUNTIMER")
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int,
@@ -239,7 +283,9 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
     private fun startScan() {
         ble!!.connectFirstAvailable()
         startedScan = true
-        ReadbackText.text = "Attempting to connect to bluetooth device"
+        runOnUiThread {
+            ReadbackText.text = "Attempting to connect to bluetooth device"
+        }
     }
 
     /**
@@ -304,9 +350,13 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener, BLE.C
                 try {
                     val temp = recieved.substring("TEMP".length + 1)
                     boardTemp = temp.toInt()
+                    runOnUiThread {
+                        ReadbackText.text = "Arduino Temp = $boardTemp"
+                    }
+                    gotOK = true
                 } catch (e:Exception)
                 {
-
+                    // If we have an issue with getting the int, just wait for the next round.
                 }
             }
             recieved.startsWith("OK") ->
