@@ -1,0 +1,7 @@
+<menu xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:title="@string/do_something" android:id="@+id/do_something" app:showAsAction="ifRoom"
+          android:icon="@android:drawable/ic_menu_add"/>
+    <item android:id="@+id/settings_item"
+          android:title="@string/action_settings"
+          app:showAsAction="never"/>
+</menu>
