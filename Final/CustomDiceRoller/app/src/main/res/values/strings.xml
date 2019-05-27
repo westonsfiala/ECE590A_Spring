@@ -1,8 +1,13 @@
 <resources>
     <string name="app_name">Custom Dice Roller</string>
-    <string name="display_text"><b>Custom Dice Roller</b>\nTap icons to roll dice</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
+    <string name="display_text"><b>Custom Dice Roller</b>\nTap icons to roll dice
+    </string>
+    <string name="tab_text_1">Roller</string>
+    <string name="tab_text_2">History</string>
+    <string name="tab_text_3">Complex Roll</string>
     <string name="action_settings">Settings</string>
     <string name="do_something">Do Something</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
