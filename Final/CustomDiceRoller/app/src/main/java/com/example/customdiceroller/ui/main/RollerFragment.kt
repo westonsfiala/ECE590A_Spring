@@ -47,9 +47,15 @@ class RollerFragment : Fragment() {
 
         val tableLayout = createdView.findViewById<TableLayout>(R.id.tableLayout)
 
+        val layoutParams = TableLayout.LayoutParams(
+            TableLayout.LayoutParams.MATCH_PARENT,
+            TableLayout.LayoutParams.MATCH_PARENT, 1.0f
+        )
+
         var rowInTable = 0
         var columnInRow = 0
         var line = TableRow(context)
+        line.layoutParams = layoutParams
         tableLayout.addView(line, rowInTable)
         line.id = "$rowInTable Line".hashCode()
         for(die in dice)
@@ -57,6 +63,7 @@ class RollerFragment : Fragment() {
             if(columnInRow >= 4)
             {
                 line = TableRow(context)
+                line.layoutParams = layoutParams
                 ++rowInTable
                 line.id = "$rowInTable Line".hashCode()
                 columnInRow = 0
