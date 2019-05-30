@@ -91,12 +91,12 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
             }
             val dieNumber = die.key
             val dieID = die.value
+
             val rollFragment = RollFragment.newInstance(dieNumber, dieID, this)
             fragmentManager?.beginTransaction()?.add(line.id, rollFragment, "$dieNumber Tag")?.commit()
+
             ++columnInRow
         }
-
-        tableLayout.removeAllViews()
     }
 
     private fun setupUpAndDownButtons(view: View)

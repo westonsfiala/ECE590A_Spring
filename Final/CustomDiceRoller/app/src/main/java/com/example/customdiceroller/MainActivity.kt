@@ -1,14 +1,12 @@
 package com.example.customdiceroller
 
-import android.app.Dialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.widget.LinearLayout
+import android.content.pm.ActivityInfo
 import android.widget.Toast
-import com.example.customdiceroller.ui.main.RollFragment
 import com.example.customdiceroller.ui.main.SectionsPagerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -20,6 +18,7 @@ class MainActivity : AppCompatActivity() {
         view_pager.adapter = SectionsPagerAdapter(this, supportFragmentManager)
         tabs.setupWithViewPager(view_pager)
         setSupportActionBar(toolbar)
+        setupDisplaySize()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -45,5 +44,9 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun setupDisplaySize() {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 }
