@@ -36,7 +36,6 @@ class HistoryFragment : Fragment() {
          *
          * @return A new instance of fragment HistoryFragment.
          */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance() =
             HistoryFragment().apply {
