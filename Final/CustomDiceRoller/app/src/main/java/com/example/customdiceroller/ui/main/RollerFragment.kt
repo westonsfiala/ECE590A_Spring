@@ -7,14 +7,16 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TableLayout
-import android.widget.TableRow
-import android.widget.TextView
+import android.widget.*
 
 import com.example.customdiceroller.R
 import kotlin.random.Random
 
+private val MAX_DICE = 100
+private val MIN_DICE = 1
+private val MAX_MODIFIER = 100
+private val START_MODIFIER = 0
+private val MIN_MODIFIER = -100
 
 /**
  * A simple [Fragment] subclass.
@@ -51,7 +53,19 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
         // Inflate the layout for this fragment
         val createdView = inflater.inflate(R.layout.fragment_roller, container, false)
 
-        val tableLayout = createdView.findViewById<TableLayout>(R.id.tableLayout)
+        return setupCreatedView(createdView)
+    }
+
+    private fun setupCreatedView(view: View) : View
+    {
+        setupDiceButtons(view)
+        setupUpAndDownButtons(view)
+        return view
+    }
+
+    private fun setupDiceButtons(view: View)
+    {
+        val tableLayout = view.findViewById<TableLayout>(R.id.tableLayout)
 
         val layoutParams = TableLayout.LayoutParams(
             TableLayout.LayoutParams.MATCH_PARENT,
@@ -82,7 +96,113 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
             ++columnInRow
         }
 
-        return createdView
+        tableLayout.removeAllViews()
+    }
+
+    private fun setupUpAndDownButtons(view: View)
+    {
+        val diceUpBut = view.findViewById<ImageButton>(R.id.diceUpButton)
+        diceUpBut.setOnClickListener {
+            setNumDice(numDice + 1)
+        }
+
+        diceUpBut.setOnLongClickListener {
+            setNumDice(MAX_DICE)
+            true
+        }
+
+        val diceDownBut = view.findViewById<ImageButton>(R.id.diceDownButton)
+        diceDownBut.setOnClickListener {
+            setNumDice(numDice - 1)
+        }
+
+        diceDownBut.setOnLongClickListener {
+            setNumDice(MIN_DICE)
+            true
+        }
+
+        val modifierUpBut = view.findViewById<ImageButton>(R.id.modifierUpButton)
+        modifierUpBut.setOnClickListener {
+            setModifier(modifier + 1)
+        }
+
+        modifierUpBut.setOnLongClickListener {
+            if(modifier >= 0)
+            {
+                setModifier(MAX_MODIFIER)
+            }
+            else
+            {
+                setModifier(START_MODIFIER)
+            }
+            true
+        }
+
+        val modifierDownBut = view.findViewById<ImageButton>(R.id.modifierDownButton)
+        modifierDownBut.setOnClickListener {
+            setModifier(modifier - 1)
+        }
+
+        modifierDownBut.setOnLongClickListener {
+            if(modifier <= 0)
+            {
+                setModifier(MIN_MODIFIER)
+            }
+            else
+            {
+                setModifier(START_MODIFIER)
+            }
+            true
+        }
+
+        updateNumDiceText(view)
+        updateModifierText(view)
+    }
+
+    private fun setNumDice(newNumDice: Int)
+    {
+        numDice = newNumDice
+        if(numDice < 1)
+        {
+            numDice = 1
+        }
+        else if(numDice > 100)
+        {
+            numDice = 100
+        }
+        updateNumDiceText(view!!)
+    }
+
+    private fun updateNumDiceText(view: View)
+    {
+        val diceText = view.findViewById<TextView>(R.id.numDiceText)
+        diceText.text = String.format("%dd",numDice)
+    }
+
+    private fun setModifier(newModifier: Int)
+    {
+        modifier = newModifier
+        if(modifier > 100)
+        {
+            modifier = 100
+        }
+        else if(modifier < -100)
+        {
+            modifier = -100
+        }
+        updateModifierText(view!!)
+    }
+
+    private fun updateModifierText(view: View)
+    {
+        val modifierText = view.findViewById<TextView>(R.id.modifierText)
+        when
+        {
+            modifier == 0 -> modifierText.text = "0"
+            modifier > 0 -> modifierText.text = String.format("+%d",modifier)
+            modifier < 0 -> modifierText.text = String.format("%d",modifier)
+        }
+
     }
 
     override fun onRollClicked(rollFragment: RollFragment)
@@ -94,7 +214,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
             dialog.dismiss()
         }
 
-        layout.minimumWidth = view!!.width / 2
+        layout.minimumWidth = (view!!.width / 2.5f).toInt()
 
         val fragmentDice = rollFragment.getDiceNumber()
 
@@ -111,12 +231,12 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
         }
         rollName.text = tempText
 
-        var sum = 0
+        var sum = modifier
         var detailString = ""
 
         for(rollIndex in 1..(numDice))
         {
-            val roll = Random.Default.nextInt(1, fragmentDice+1) + modifier
+            val roll = Random.Default.nextInt(1, fragmentDice+1)
             sum += roll
             detailString += "$roll,"
         }
