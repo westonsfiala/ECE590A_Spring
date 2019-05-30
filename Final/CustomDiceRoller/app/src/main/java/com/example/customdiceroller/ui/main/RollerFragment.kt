@@ -2,6 +2,7 @@ package com.example.customdiceroller.ui.main
 
 import android.app.Dialog
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -92,6 +93,8 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
         layout.setOnClickListener {
             dialog.dismiss()
         }
+
+        layout.minimumWidth = view!!.width / 2
 
         val fragmentDice = rollFragment.getDiceNumber()
 

@@ -4,38 +4,43 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:orientation="vertical" android:gravity="center" android:layout_weight="1.0"
-              android:id="@+id/layout">
+              android:gravity="center"
+              android:layout_weight="1.0"
+              android:id="@+id/layout" app:layout_constraintDimensionRatio="1:1" android:orientation="vertical">
 
     <TextView
             android:text="@string/temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/rollName"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp" android:layout_marginEnd="8dp" android:layout_marginBottom="8dp"
-            android:textAlignment="gravity"
+            android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@android:color/primary_text_dark"/>
+            android:textColor="@android:color/primary_text_dark"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"/>
     <TextView
             android:text="@string/temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/rollTotal" android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:id="@+id/rollTotal"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-            android:textColor="@android:color/primary_text_dark" android:textStyle="bold"/>
+            android:textColor="@android:color/primary_text_dark" android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp" android:layout_marginEnd="8dp"/>
     <TextView
             android:text="@string/temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/rollDetails"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp" android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp" android:textAlignment="center"
+            android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@android:color/primary_text_dark"/>
+            android:textColor="@android:color/primary_text_dark"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
 </LinearLayout>
