@@ -1,42 +1,35 @@
-package com.example.customdiceroller
+package com.example.customdiceroller.ui.main
 
-
-import android.app.Dialog
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
-import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
+import com.example.customdiceroller.R
 import kotlinx.android.synthetic.main.fragment_roll.*
 
-private const val ARG_NAME = "name"
+private const val ARG_DICE_NUMBER = "diceNumber"
 private const val ARG_IMAGE_ID = "imageID"
 
 /**
  * A simple [Fragment] subclass.
  * Use the [RollFragment.newInstance] factory method to
  * create an instance of this fragment.
- *
  */
 class RollFragment : Fragment() {
     private var rollName: String = "TEMP"
+    private var dieNumber = 0
     private var imageID: Int = R.drawable.ic_launcher_foreground
+    private var mListener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            val blah = it.getString(ARG_NAME)
-
-            if(blah != null)
-            {
-                rollName = blah
-            }
+            val diceNumber = it.getInt(ARG_DICE_NUMBER,1)
+            rollName = "d$diceNumber"
+            dieNumber = diceNumber
             imageID = it.getInt(ARG_IMAGE_ID)
         }
     }
@@ -48,7 +41,7 @@ class RollFragment : Fragment() {
         // Inflate the layout for this fragment
         val createdView = inflater.inflate(R.layout.fragment_roll, container, false)
 
-        createdView.findViewById<ImageView>(R.id.displayImage).setImageResource(imageID)
+        createdView.findViewById<ImageButton>(R.id.displayImage).setImageResource(imageID)
         createdView.findViewById<TextView>(R.id.displayText).text = rollName
 
         return createdView
@@ -57,15 +50,19 @@ class RollFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        layout.setOnClickListener {
-            val dialog = Dialog(context!!)
-            dialog.setContentView(R.layout.dialog_layout)
-            val layout = dialog.findViewById<LinearLayout>(R.id.layout)
-            layout.setOnClickListener {
-                dialog.dismiss()
-            }
-            dialog.show()
+        displayImage.setOnClickListener {
+            mListener?.onRollClicked(this)
         }
+    }
+
+    fun getDiceNumber() : Int
+    {
+        return dieNumber
+    }
+
+    interface OnFragmentInteractionListener
+    {
+        fun onRollClicked(rollFragment: RollFragment)
     }
 
     companion object {
@@ -73,17 +70,19 @@ class RollFragment : Fragment() {
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
-         * @param rollName Parameter 1.
+         * @param dice Parameter 1.
          * @param imageID Parameter 2.
+         * @param listener Parameter 3.
          * @return A new instance of fragment RollFragment.
          */
         @JvmStatic
-        fun newInstance(rollName: String, imageID: Int) =
+        fun newInstance(dice: Int, imageID: Int, listener: OnFragmentInteractionListener) =
             RollFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_NAME, rollName)
+                    putInt(ARG_DICE_NUMBER, dice)
                     putInt(ARG_IMAGE_ID, imageID)
                 }
+                mListener = listener
             }
     }
 }

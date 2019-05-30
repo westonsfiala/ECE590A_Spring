@@ -1,5 +1,6 @@
 package com.example.customdiceroller.ui.main
 
+import android.app.Dialog
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -8,10 +9,10 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TableRow
+import android.widget.TextView
 
 import com.example.customdiceroller.R
-import com.example.customdiceroller.RollFragment
-import kotlinx.android.synthetic.main.fragment_roller.*
+import kotlin.random.Random
 
 
 /**
@@ -20,16 +21,20 @@ import kotlinx.android.synthetic.main.fragment_roller.*
  * create an instance of this fragment.
  *
  */
-class RollerFragment : Fragment() {
+class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
 
-    private val dice = mapOf("d4" to R.drawable.ic_d4,
-        "d6" to R.drawable.ic_perspective_dice_six,
-        "d8" to R.drawable.ic_dice_eight_faces_eight,
-        "d10" to R.drawable.ic_d10,
-        "d12" to R.drawable.ic_d12,
-        "d20" to R.drawable.ic_dice_twenty_faces_twenty,
-        "d100" to R.drawable.ic_rolling_dice_cup
+    private val dice = mapOf(
+        4 to R.drawable.ic_d4,
+        6 to R.drawable.ic_perspective_dice_six,
+        8 to R.drawable.ic_dice_eight_faces_eight,
+        10 to R.drawable.ic_d10,
+        12 to R.drawable.ic_d12,
+        20 to R.drawable.ic_dice_twenty_faces_twenty,
+        100 to R.drawable.ic_rolling_dice_cup
         )
+
+    private var numDice = 1
+    private var modifier = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,13 +74,59 @@ class RollerFragment : Fragment() {
                 columnInRow = 0
                 tableLayout.addView(line, rowInTable)
             }
-            val name = die.key
+            val dieNumber = die.key
             val dieID = die.value
-            fragmentManager?.beginTransaction()?.add(line.id, RollFragment.newInstance(name, dieID), "$name Tag")?.commit()
+            val rollFragment = RollFragment.newInstance(dieNumber, dieID, this)
+            fragmentManager?.beginTransaction()?.add(line.id, rollFragment, "$dieNumber Tag")?.commit()
             ++columnInRow
         }
 
         return createdView
+    }
+
+    override fun onRollClicked(rollFragment: RollFragment)
+    {
+        val dialog = Dialog(context!!)
+        dialog.setContentView(R.layout.dialog_layout)
+        val layout = dialog.findViewById<LinearLayout>(R.id.layout)
+        layout.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        val fragmentDice = rollFragment.getDiceNumber()
+
+        val rollName = dialog.findViewById<TextView>(R.id.rollName)
+
+        var tempText = String.format("%dd%d",numDice, fragmentDice)
+        if(modifier != 0)
+        {
+            if(modifier > 0)
+            {
+                tempText += "+"
+            }
+            tempText += "$modifier"
+        }
+        rollName.text = tempText
+
+        var sum = 0
+        var detailString = ""
+
+        for(rollIndex in 1..(numDice))
+        {
+            val roll = Random.Default.nextInt(1, fragmentDice+1) + modifier
+            sum += roll
+            detailString += "$roll,"
+        }
+
+        val correctedString = detailString.removeRange(detailString.length-1,detailString.length)
+
+        val rollTotal = dialog.findViewById<TextView>(R.id.rollTotal)
+        rollTotal.text = "$sum"
+
+        val rollDetails = dialog.findViewById<TextView>(R.id.rollDetails)
+        rollDetails.text = correctedString
+
+        dialog.show()
     }
 
     companion object {
