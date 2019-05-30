@@ -1,12 +1,16 @@
 package com.example.customdiceroller
 
 
+import android.app.Dialog
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_roll.*
@@ -21,13 +25,18 @@ private const val ARG_IMAGE_ID = "imageID"
  *
  */
 class RollFragment : Fragment() {
-    private var rollName: String? = null
-    private var imageID: Int? = null
+    private var rollName: String = "TEMP"
+    private var imageID: Int = R.drawable.ic_launcher_foreground
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            rollName = it.getString(ARG_NAME)
+            val blah = it.getString(ARG_NAME)
+
+            if(blah != null)
+            {
+                rollName = blah
+            }
             imageID = it.getInt(ARG_IMAGE_ID)
         }
     }
@@ -39,7 +48,7 @@ class RollFragment : Fragment() {
         // Inflate the layout for this fragment
         val createdView = inflater.inflate(R.layout.fragment_roll, container, false)
 
-        createdView.findViewById<ImageView>(R.id.displayImage).setImageResource(imageID!!)
+        createdView.findViewById<ImageView>(R.id.displayImage).setImageResource(imageID)
         createdView.findViewById<TextView>(R.id.displayText).text = rollName
 
         return createdView
@@ -49,7 +58,13 @@ class RollFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         layout.setOnClickListener {
-            Toast.makeText(context, rollName, Toast.LENGTH_SHORT).show()
+            val dialog = Dialog(context!!)
+            dialog.setContentView(R.layout.dialog_layout)
+            val layout = dialog.findViewById<LinearLayout>(R.id.layout)
+            layout.setOnClickListener {
+                dialog.dismiss()
+            }
+            dialog.show()
         }
     }
 

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical" android:gravity="center" android:layout_weight="1.0"
+              android:id="@+id/layout">
+
+    <TextView
+            android:text="@string/temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rollName"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp" android:layout_marginEnd="8dp" android:layout_marginBottom="8dp"
+            android:textAlignment="gravity"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@android:color/primary_text_dark"/>
+    <TextView
+            android:text="@string/temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rollTotal" android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+            android:textColor="@android:color/primary_text_dark" android:textStyle="bold"/>
+    <TextView
+            android:text="@string/temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rollDetails"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp" android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@android:color/primary_text_dark"/>
+</LinearLayout>
