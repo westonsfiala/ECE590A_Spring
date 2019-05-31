@@ -60,6 +60,11 @@ class RollFragment : Fragment() {
         return dieNumber
     }
 
+    fun getDiceImageID() : Int
+    {
+        return imageID
+    }
+
     interface OnFragmentInteractionListener
     {
         fun onRollClicked(rollFragment: RollFragment)

@@ -1,6 +1,8 @@
 package com.example.customdiceroller
 
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -18,9 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         view_pager.adapter = SectionsPagerAdapter(this, supportFragmentManager)
         tabs.setupWithViewPager(view_pager)
-        setSupportActionBar(toolbar)
-
-
+        setSupportActionBar(settingsToolbar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -40,12 +40,19 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.settings_item -> {
-                val text = "settings clicked"
-                val duration = Toast.LENGTH_LONG
-                Toast.makeText(this, text, duration).show()
+
+                val settingsIntent = Intent(this, Settings::class.java)
+                startActivity(settingsIntent)
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    fun shakeToRoll() : Boolean
+    {
+        return getSharedPreferences(
+            getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+            .getBoolean(getString(R.string.shake_preference_key),false)
     }
 }

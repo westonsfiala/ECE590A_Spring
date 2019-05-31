@@ -10,4 +10,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="temp">temp</string>
     <string name="clear_history">Clear History</string>
+    <string name="shake_to_roll">Shake To Roll</string>
+    <string name="preference_file_key">CustomDiceRollerPreferencesKey</string>
+    <string name="shake_preference_key">ShakePreferenceKey</string>
 </resources>
