@@ -9,11 +9,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.example.customdiceroller.R
 
 
 
-class HistoryStamp(val rollResult: Int, val rollText: String, val rollDetails: String, val timeStamp: String)
+class HistoryStamp(private val rollResult: Int,
+                   private val rollText: String,
+                   private val rollDetails: String,
+                   private val timeStamp: String)
+{
+    fun createView(inflater: LayoutInflater) : View
+    {
+        val createdView = inflater.inflate(R.layout.roll_history_layout, null)
+
+        createdView.findViewById<TextView>(R.id.rollResultText).text = "$rollResult"
+        createdView.findViewById<TextView>(R.id.rollTitleText).text = rollText
+        createdView.findViewById<TextView>(R.id.rollDetailsText).text = rollDetails
+        createdView.findViewById<TextView>(R.id.rollTimeStampText).text = timeStamp
+
+        return createdView
+    }
+}
 
 /**
  * A simple [Fragment] subclass.
@@ -35,16 +52,26 @@ class HistoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-
-        pageViewModel.rollHistory.observe(this, Observer<List<HistoryStamp>> {
+        pageViewModel.rollHistory.observe(this, Observer<MutableList<HistoryStamp>> {
             val historyLayout = view?.findViewById<LinearLayout>(R.id.historyLayout)
 
             historyLayout?.removeAllViews()
 
+            for(history in it!!)
+            {
+                historyLayout?.addView(history.createView(LayoutInflater.from(context)))
+            }
         })
 
+        val createdView = inflater.inflate(R.layout.fragment_history, container, false)
+
+        pageViewModel.addRollHistory(HistoryStamp(5555,"name", "details", "time"))
+
+        // Testing for the layout.
+        //createdView.findViewById<LinearLayout>(R.id.historyLayout).addView(HistoryStamp(5555,"name", "details", "time").createView(inflater))
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_history, container, false)
+        return createdView
     }
 
 

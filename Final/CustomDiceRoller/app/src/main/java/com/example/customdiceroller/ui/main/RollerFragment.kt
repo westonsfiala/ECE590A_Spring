@@ -14,6 +14,11 @@ import android.widget.*
 
 import com.example.customdiceroller.R
 import kotlinx.android.synthetic.main.fragment_roller.*
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.*
 import kotlin.random.Random
 
 private val MAX_DICE = 100
@@ -240,16 +245,16 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
 
         val rollName = dialog.findViewById<TextView>(R.id.rollName)
 
-        var tempText = String.format("%dd%d",numDice, fragmentDice)
+        var rollDisplay = String.format("%dd%d",numDice, fragmentDice)
         if(modifier != 0)
         {
             if(modifier > 0)
             {
-                tempText += "+"
+                rollDisplay += "+"
             }
-            tempText += "$modifier"
+            rollDisplay += "$modifier"
         }
-        rollName.text = tempText
+        rollName.text = rollDisplay
 
         var sum = modifier
         var detailString = ""
@@ -268,6 +273,12 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
 
         val rollDetails = dialog.findViewById<TextView>(R.id.rollDetails)
         rollDetails.text = correctedString
+
+        val time = Calendar.getInstance().time
+        val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+        val formattedDate = formatter.format(time)
+
+        pageViewModel.addRollHistory(HistoryStamp(sum,rollDisplay,correctedString,formattedDate))
 
         dialog.show()
     }
