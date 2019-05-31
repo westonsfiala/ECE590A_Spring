@@ -35,20 +35,29 @@ class PageViewModel : ViewModel() {
     }
 
     private val _rollHistory = MutableLiveData<MutableList<HistoryStamp>>()
-    val rollHistory: LiveData<MutableList<HistoryStamp>> = Transformations.map(_rollHistory) {
-        _rollHistory.value
+    private val _singleRollHistory = MutableLiveData<HistoryStamp>()
+    val singleRollHistory: LiveData<HistoryStamp> = Transformations.map(_singleRollHistory) {
+        _singleRollHistory.value
     }
+
     fun addRollHistory(rollData: HistoryStamp)
     {
-        var history = _rollHistory.value
-
-        if(history == null)
+        if(_rollHistory.value == null)
         {
-            history = mutableListOf()
+            _rollHistory.value = mutableListOf()
         }
 
-        history.add(rollData)
+        _rollHistory.value!!.add(rollData)
 
-        _rollHistory.value = history
+        _singleRollHistory.value = rollData
+    }
+
+    fun getFullRollHistory() : MutableList<HistoryStamp>
+    {
+        if(_rollHistory.value == null)
+        {
+            _rollHistory.value = mutableListOf()
+        }
+        return _rollHistory.value!!
     }
 }

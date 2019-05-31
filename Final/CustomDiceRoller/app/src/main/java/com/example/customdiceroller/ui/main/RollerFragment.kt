@@ -52,7 +52,9 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pageViewModel = ViewModelProviders.of(this).get(PageViewModel::class.java)
+        pageViewModel = activity?.run {
+            ViewModelProviders.of(this).get(PageViewModel::class.java)
+        } ?: throw Exception("Invalid Activity")
     }
 
     override fun onCreateView(
@@ -278,7 +280,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
         val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
         val formattedDate = formatter.format(time)
 
-        pageViewModel.addRollHistory(HistoryStamp(sum,rollDisplay,correctedString,formattedDate))
+        pageViewModel.addRollHistory(HistoryStamp.newInstance(sum,rollDisplay,correctedString,formattedDate))
 
         dialog.show()
     }

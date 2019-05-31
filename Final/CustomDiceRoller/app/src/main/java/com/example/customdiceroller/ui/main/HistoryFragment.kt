@@ -14,13 +14,16 @@ import com.example.customdiceroller.R
 
 
 
-class HistoryStamp(private val rollResult: Int,
-                   private val rollText: String,
-                   private val rollDetails: String,
-                   private val timeStamp: String)
+class HistoryStamp
 {
+    private var rollResult = 0
+    private var rollText = "temp"
+    private var rollDetails = "temp"
+    private var timeStamp = "temp"
+
     fun createView(inflater: LayoutInflater) : View
     {
+
         val createdView = inflater.inflate(R.layout.roll_history_layout, null)
 
         createdView.findViewById<TextView>(R.id.rollResultText).text = "$rollResult"
@@ -30,6 +33,21 @@ class HistoryStamp(private val rollResult: Int,
 
         return createdView
     }
+
+    companion object {
+
+    @JvmStatic
+    fun newInstance(_rollResult: Int,
+                    _rollText: String,
+                    _rollDetails: String,
+                    _timeStamp: String) =
+        HistoryStamp().apply {
+            rollResult = _rollResult
+            rollText = _rollText
+            rollDetails = _rollDetails
+            timeStamp = _timeStamp
+        }
+}
 }
 
 /**
@@ -44,7 +62,9 @@ class HistoryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pageViewModel = ViewModelProviders.of(this).get(PageViewModel::class.java)
+        pageViewModel = activity?.run {
+            ViewModelProviders.of(this).get(PageViewModel::class.java)
+        } ?: throw Exception("Invalid Activity")
     }
 
     override fun onCreateView(
@@ -52,26 +72,36 @@ class HistoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        pageViewModel.rollHistory.observe(this, Observer<MutableList<HistoryStamp>> {
-            val historyLayout = view?.findViewById<LinearLayout>(R.id.historyLayout)
-
-            historyLayout?.removeAllViews()
-
-            for(history in it!!)
-            {
-                historyLayout?.addView(history.createView(LayoutInflater.from(context)))
-            }
+        pageViewModel.singleRollHistory.observe(this, Observer<HistoryStamp> {
+            addHistory(view!!,it)
         })
 
         val createdView = inflater.inflate(R.layout.fragment_history, container, false)
 
-        pageViewModel.addRollHistory(HistoryStamp(5555,"name", "details", "time"))
+        //pageViewModel.addRollHistory(HistoryStamp.newInstance(5555,"name", "details", "time"))
 
-        // Testing for the layout.
-        //createdView.findViewById<LinearLayout>(R.id.historyLayout).addView(HistoryStamp(5555,"name", "details", "time").createView(inflater))
+        //processHistory(createdView, pageViewModel.getFullRollHistory())
 
         // Inflate the layout for this fragment
         return createdView
+    }
+
+    private fun processHistory(view: View, history: MutableList<HistoryStamp>?)
+    {
+        val historyLayout = view.findViewById<LinearLayout>(R.id.historyLayout)
+        historyLayout?.removeAllViews()
+
+        if(history != null) {
+            for (historyItem in history) {
+                historyLayout?.addView(historyItem.createView(LayoutInflater.from(context)))
+            }
+        }
+    }
+
+    private fun addHistory(view: View, history: HistoryStamp?)
+    {
+        val historyLayout = view.findViewById<LinearLayout>(R.id.historyLayout)
+        historyLayout?.addView(history?.createView(LayoutInflater.from(context)))
     }
 
 
