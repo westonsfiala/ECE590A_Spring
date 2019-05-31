@@ -1,6 +1,9 @@
 package com.example.customdiceroller.ui.main
 
 import android.app.Dialog
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v4.app.Fragment
@@ -10,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.*
 
 import com.example.customdiceroller.R
+import kotlinx.android.synthetic.main.fragment_roller.*
 import kotlin.random.Random
 
 private val MAX_DICE = 100
@@ -26,6 +30,8 @@ private val MIN_MODIFIER = -100
  */
 class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
 
+    private lateinit var pageViewModel: PageViewModel
+
     private val dice = mapOf(
         4 to R.drawable.ic_d4,
         6 to R.drawable.ic_perspective_dice_six,
@@ -41,9 +47,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            //param1 = it.getString(ARG_PARAM1)
-        }
+        pageViewModel = ViewModelProviders.of(this).get(PageViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -52,6 +56,16 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
     ): View? {
         // Inflate the layout for this fragment
         val createdView = inflater.inflate(R.layout.fragment_roller, container, false)
+
+        pageViewModel.numDice.observe(this, Observer<Int> {
+            numDice = it!!
+            updateNumDiceText(view!!)
+        })
+
+        pageViewModel.modifier.observe(this, Observer<Int> {
+            modifier = it!!
+            updateModifierText(view!!)
+        })
 
         return setupCreatedView(createdView)
     }
@@ -91,11 +105,17 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
             }
             val dieNumber = die.key
             val dieID = die.value
+            val fragmentTag = "$dieNumber Tag"
+            val oldFragment = fragmentManager?.findFragmentByTag(fragmentTag)
+
+            if(oldFragment != null) {
+                fragmentManager?.beginTransaction()?.remove(oldFragment)?.commit()
+            }
 
             val rollFragment = RollFragment.newInstance(dieNumber, dieID, this)
-            fragmentManager?.beginTransaction()?.add(line.id, rollFragment, "$dieNumber Tag")?.commit()
-
+            fragmentManager?.beginTransaction()?.add(line.id, rollFragment, fragmentTag)?.commit()
             ++columnInRow
+
         }
     }
 
@@ -161,7 +181,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
 
     private fun setNumDice(newNumDice: Int)
     {
-        numDice = newNumDice
+        pageViewModel.setNumDice(newNumDice)
         if(numDice < 1)
         {
             numDice = 1
@@ -181,7 +201,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
 
     private fun setModifier(newModifier: Int)
     {
-        modifier = newModifier
+        pageViewModel.setModifier(newModifier)
         if(modifier > 100)
         {
             modifier = 100
