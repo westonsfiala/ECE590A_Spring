@@ -1,11 +1,13 @@
 package com.example.customdiceroller
 
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
+import com.example.customdiceroller.ui.main.PageViewModel
 import com.example.customdiceroller.ui.main.SectionsPagerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -17,6 +19,8 @@ class MainActivity : AppCompatActivity() {
         view_pager.adapter = SectionsPagerAdapter(this, supportFragmentManager)
         tabs.setupWithViewPager(view_pager)
         setSupportActionBar(toolbar)
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -28,9 +32,10 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle item selection
         return when (item.itemId) {
-            R.id.do_something -> {
-                val text = "do something clicked"
-                val duration = Toast.LENGTH_LONG
+            R.id.clearHistory -> {
+                ViewModelProviders.of(this).get(PageViewModel::class.java).clearHistory()
+                val text = "History Cleared"
+                val duration = Toast.LENGTH_SHORT
                 Toast.makeText(this, text, duration).show()
                 true
             }

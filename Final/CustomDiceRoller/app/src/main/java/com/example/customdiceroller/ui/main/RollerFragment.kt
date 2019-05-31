@@ -265,10 +265,10 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener {
         {
             val roll = Random.Default.nextInt(1, fragmentDice+1)
             sum += roll
-            detailString += "$roll,"
+            detailString += "$roll, "
         }
 
-        val correctedString = detailString.removeRange(detailString.length-1,detailString.length)
+        val correctedString = detailString.removeRange(detailString.length-2,detailString.length)
 
         val rollTotal = dialog.findViewById<TextView>(R.id.rollTotal)
         rollTotal.text = "$sum"

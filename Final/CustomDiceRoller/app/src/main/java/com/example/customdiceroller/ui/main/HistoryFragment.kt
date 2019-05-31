@@ -76,32 +76,24 @@ class HistoryFragment : Fragment() {
             addHistory(view!!,it)
         })
 
-        val createdView = inflater.inflate(R.layout.fragment_history, container, false)
-
-        //pageViewModel.addRollHistory(HistoryStamp.newInstance(5555,"name", "details", "time"))
-
-        //processHistory(createdView, pageViewModel.getFullRollHistory())
+        pageViewModel.clearHistory.observe(this, Observer<Boolean> {
+            clearHistory()
+        })
 
         // Inflate the layout for this fragment
-        return createdView
-    }
-
-    private fun processHistory(view: View, history: MutableList<HistoryStamp>?)
-    {
-        val historyLayout = view.findViewById<LinearLayout>(R.id.historyLayout)
-        historyLayout?.removeAllViews()
-
-        if(history != null) {
-            for (historyItem in history) {
-                historyLayout?.addView(historyItem.createView(LayoutInflater.from(context)))
-            }
-        }
+        return inflater.inflate(R.layout.fragment_history, container, false)
     }
 
     private fun addHistory(view: View, history: HistoryStamp?)
     {
         val historyLayout = view.findViewById<LinearLayout>(R.id.historyLayout)
-        historyLayout?.addView(history?.createView(LayoutInflater.from(context)))
+        historyLayout?.addView(history?.createView(LayoutInflater.from(context)),0)
+    }
+
+    private fun clearHistory()
+    {
+        val historyLayout = view?.findViewById<LinearLayout>(R.id.historyLayout)
+        historyLayout?.removeAllViews()
     }
 
 
