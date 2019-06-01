@@ -21,6 +21,7 @@ import com.example.customdiceroller.MainActivity
 import com.example.customdiceroller.R
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 private const val MAX_DICE = 100
@@ -47,7 +48,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
     private var mSensorManager : SensorManager?= null
     private var mAccelerometer : Sensor?= null
 
-    private var testDie : shakeDie?= null
+    private var shakerDice = mutableListOf<ShakeDie>()
     private var runThread = false
 
     private val dice = mapOf(
@@ -264,25 +265,31 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
         {
             val dialog = Dialog(context!!)
             dialog.setContentView(R.layout.diceroll_layout)
-            val layout = dialog.findViewById<ConstraintLayout>(R.id.rollArea)
-            layout.setOnClickListener {
+            val rollArea = dialog.findViewById<ConstraintLayout>(R.id.rollArea)
+            rollArea.setOnClickListener {
                 dialog.dismiss()
             }
 
-            testDie = shakeDie(rollFragment.getDiceImageID())
 
-            runThread = true
+
             dialog.setOnDismissListener {
                 runThread = false
             }
 
-            diceRollThreadRunner(dialog)
-
-            //val dialog = AlertDialog.Builder(context!!).create()
-            //dialog.setTitle("Implement Roller")
-            //dialog.setMessage("xVel = $xVelocity \n" +
-            //        "yVel = $yVelocity \n" +
-            //        "zVel = $zVelocity")
+            dialog.setOnShowListener {
+                runThread = true
+                for(dice in 0 until numDice) {
+                    val die = ShakeDie(rollFragment.getDiceImageID())
+                    rollArea.addView(die.getImage())
+                    die.getImage().x = Random.nextFloat() * rollArea.width.toFloat()
+                    die.getImage().y = Random.nextFloat() * rollArea.height.toFloat()
+                    val scale = 1.0f + Random.nextFloat()
+                    die.getImage().scaleX = scale
+                    die.getImage().scaleY = scale
+                    shakerDice.add(die)
+                }
+                diceRollThreadRunner(dialog)
+            }
 
             //dialog.setCancelable(false)
 
@@ -365,41 +372,82 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
         val diceShakerThread = Thread {
 
             val rollContainer = rollArea.findViewById<ConstraintLayout>(R.id.rollArea)
-            if(testDie != null && rollContainer != null) {
-
-                activity?.runOnUiThread {
-                    rollContainer.addView(testDie?.getImage())
-                }
-
-                testDie!!.getImage().x = Random.nextFloat() * rollContainer.width.toFloat()
-                testDie!!.getImage().y = Random.nextFloat() * rollContainer.height.toFloat()
+            if(rollContainer != null) {
 
                 while (runThread) {
-                    val currentX = testDie!!.getImage().x
-                    val currentRight = currentX + testDie!!.getImage().width
-                    val currentY = testDie!!.getImage().y
-                    val currentBottom = currentY + testDie!!.getImage().height
+                    for (shakeDie in shakerDice) {
+                        var newX = shakeDie.getImage().x + shakeDie.xVelocity
+                        val newRight = newX + shakeDie.getImage().width
+                        var newY = shakeDie.getImage().y + shakeDie.yVelocity
+                        val newBottom = newY + shakeDie.getImage().height
+                        var newRotation = shakeDie.rotationSpeed
 
-                    if(currentX < 0 || currentRight > rollContainer.width)
-                    {
-                        testDie!!.xVelocity *= -1
+                        val tooLeft = newX < 0
+                        val tooRight = newRight > rollContainer.width
+
+                        if (tooLeft) {
+                            newX = 0f
+                        } else if (tooRight) {
+                            newX = rollContainer.width.toFloat() - shakeDie.getImage().width
+                        }
+
+                        if (tooLeft || tooRight) {
+                            shakeDie.xVelocity *= -.75f
+                            // Throw a bit of randomness in.
+                            shakeDie.xVelocity += Random.nextFloat() - 0.5f
+                        }
+
+                        val tooHigh = newY < 0
+                        val tooLow = newBottom > rollContainer.height
+
+                        if (tooHigh) {
+                            newY = 0f
+                        } else if (tooLow) {
+                            newY = rollContainer.height.toFloat() - shakeDie.getImage().height
+                        }
+
+                        if (tooHigh || tooLow) {
+                            shakeDie.yVelocity *= -.75f
+                            // Throw a bit of randomness in.
+                            shakeDie.yVelocity += Random.nextFloat() - 0.5f
+                        }
+
+                        activity?.runOnUiThread {
+                            shakeDie.getImage().x = newX
+                            shakeDie.getImage().y = newY
+                            shakeDie.getImage().rotation += newRotation
+                        }
+
+                        val movement = sqrt(
+                            (shakeDie.getImage().x - newX) * (shakeDie.getImage().x - newX)
+                                    + (shakeDie.getImage().y - newY) * (shakeDie.getImage().y - newY)
+                        )
+
+                        if (movement < 1) {
+                            newRotation *= .99f
+                        } else if (movement > 25) {
+                            newRotation *= 1.01f
+                        }
+
+                        if (newRotation > 1f) {
+                            newRotation = 1f
+                        } else if (newRotation < -1f) {
+                            newRotation = -1f
+                        }
+
+                        shakeDie.xVelocity += -xAccel * 0.05f
+                        shakeDie.yVelocity += yAccel * 0.05f
+                        shakeDie.rotationSpeed = newRotation
                     }
 
-                    if(currentY < 0 || currentBottom > rollContainer.height)
-                    {
-                        testDie!!.yVelocity *= -1
-                    }
-
-                    activity?.runOnUiThread {
-                        testDie!!.getImage().x = currentX + testDie!!.xVelocity
-                        testDie!!.getImage().y = currentY + testDie!!.yVelocity
-                    }
-
-                    sleep(50)
+                    sleep(1)
                 }
 
                 activity?.runOnUiThread {
-                    rollContainer.removeView(testDie!!.getImage())
+                    for(shakeDie in shakerDice) {
+                        rollContainer.removeView(shakeDie.getImage())
+                    }
+                    shakerDice.clear()
                 }
             }
         }
@@ -422,17 +470,17 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
             }
     }
 
-    inner class shakeDie(private var dieImageID : Int)
+    inner class ShakeDie(private var dieImageID : Int)
     {
-        var xVelocity = 0
-        var yVelocity = 0
-        var spinVelocity = 0
+        var xVelocity = 0f
+        var yVelocity = 0f
+        var rotationSpeed = 0f
         private var dieView : ImageView ?= null
 
         init {
-            xVelocity = Random.nextInt(-50, 50)
-            yVelocity = Random.nextInt(-50,50)
-            spinVelocity = Random.nextInt(-10,10)
+            xVelocity = Random.nextInt(-50, 50).toFloat()
+            yVelocity = Random.nextInt(-50,50).toFloat()
+            rotationSpeed = Random.nextFloat() - 0.5f
         }
 
         fun getImage() : ImageView
