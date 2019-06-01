@@ -44,12 +44,16 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
     private var yAccel = 0.0f
     private var zAccel = 0.0f
 
+    private var changeVector = mutableListOf(0f,0f,0f,0f,0f,0f,0f,0f,0f,0f,0f)
+    private var accelStable = false
+
     // Accelerometer variables
     private var mSensorManager : SensorManager?= null
     private var mAccelerometer : Sensor?= null
 
     private var shakerDice = mutableListOf<ShakeDie>()
     private var runThread = false
+    private var threadDead = true
 
     private val dice = mapOf(
         4 to R.drawable.ic_d4,
@@ -263,96 +267,123 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
 
         if(mainActivity.shakeToRoll())
         {
-            val dialog = Dialog(context!!)
-            dialog.setContentView(R.layout.diceroll_layout)
-            val rollArea = dialog.findViewById<ConstraintLayout>(R.id.rollArea)
-            rollArea.setOnClickListener {
-                dialog.dismiss()
-            }
-
-
-
-            dialog.setOnDismissListener {
-                runThread = false
-            }
-
-            dialog.setOnShowListener {
-                runThread = true
-                for(dice in 0 until numDice) {
-                    val die = ShakeDie(rollFragment.getDiceImageID())
-                    rollArea.addView(die.getImage())
-                    die.getImage().x = Random.nextFloat() * rollArea.width.toFloat()
-                    die.getImage().y = Random.nextFloat() * rollArea.height.toFloat()
-                    val scale = 1.0f + Random.nextFloat()
-                    die.getImage().scaleX = scale
-                    die.getImage().scaleY = scale
-                    shakerDice.add(die)
-                }
-                diceRollThreadRunner(dialog)
-            }
-
-            //dialog.setCancelable(false)
-
-            dialog.show()
+            runShakeRoller(rollFragment)
         }
         else
         {
-            val dialog = Dialog(context!!)
-            dialog.setContentView(R.layout.dialog_layout)
-            val layout = dialog.findViewById<LinearLayout>(R.id.rollerLayout)
-            layout.setOnClickListener {
-                dialog.dismiss()
-            }
-
-            layout.minimumWidth = (view!!.width / 2.5f).toInt()
-
-            val fragmentDice = rollFragment.getDiceNumber()
-
-            val rollName = dialog.findViewById<TextView>(R.id.rollName)
-
-            var rollDisplay = String.format("%dd%d", numDice, fragmentDice)
-            if (modifier != 0) {
-                if (modifier > 0) {
-                    rollDisplay += "+"
-                }
-                rollDisplay += "$modifier"
-            }
-            rollName.text = rollDisplay
-
-            var sum = modifier
-            var detailString = ""
-
-            for (rollIndex in 1..(numDice)) {
-                val roll = Random.Default.nextInt(1, fragmentDice + 1)
-                sum += roll
-                detailString += "$roll, "
-            }
-
-            val correctedString = detailString.removeRange(detailString.length - 2, detailString.length)
-
-            val rollTotal = dialog.findViewById<TextView>(R.id.rollTotal)
-            rollTotal.text = "$sum"
-
-            val rollDetails = dialog.findViewById<TextView>(R.id.rollDetails)
-            rollDetails.text = correctedString
-
-            val time = Calendar.getInstance().time
-            val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
-            val formattedDate = formatter.format(time)
-
-            pageViewModel.addRollHistory(HistoryStamp.newInstance(sum, rollDisplay, correctedString, formattedDate))
-
-            dialog.show()
+            displayRollResult(rollFragment)
         }
     }
+
+    private fun runShakeRoller(rollFragment: RollFragment)
+    {
+        val dialog = Dialog(context!!)
+        dialog.setContentView(R.layout.diceroll_layout)
+        val rollArea = dialog.findViewById<ConstraintLayout>(R.id.rollArea)
+
+        rollArea.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.setOnDismissListener {
+            runThread = false
+            while(!threadDead)
+            {
+                sleep(1)
+            }
+            displayRollResult(rollFragment)
+        }
+
+        dialog.setOnShowListener {
+            runThread = true
+            for(dice in 0 until numDice) {
+                val die = ShakeDie(rollFragment.getDiceImageID())
+                rollArea.addView(die.getImage())
+                die.getImage().x = Random.nextFloat() * rollArea.width.toFloat()
+                die.getImage().y = Random.nextFloat() * rollArea.height.toFloat()
+                val scale = 1.0f + Random.nextFloat()
+                die.getImage().scaleX = scale
+                die.getImage().scaleY = scale
+                shakerDice.add(die)
+            }
+            diceRollThreadRunner(dialog)
+        }
+
+        dialog.show()
+    }
+
+    private fun displayRollResult(rollFragment: RollFragment)
+    {
+        val dialog = Dialog(context!!)
+        dialog.setContentView(R.layout.dialog_layout)
+        val layout = dialog.findViewById<LinearLayout>(R.id.rollerLayout)
+        layout.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        layout.minimumWidth = (view!!.width / 2.5f).toInt()
+
+        val fragmentDice = rollFragment.getDiceNumber()
+
+        val rollName = dialog.findViewById<TextView>(R.id.rollName)
+
+        var rollDisplay = String.format("%dd%d", numDice, fragmentDice)
+        if (modifier != 0) {
+            if (modifier > 0) {
+                rollDisplay += "+"
+            }
+            rollDisplay += "$modifier"
+        }
+        rollName.text = rollDisplay
+
+        var sum = modifier
+        var detailString = ""
+
+        for (rollIndex in 1..(numDice)) {
+            val roll = Random.Default.nextInt(1, fragmentDice + 1)
+            sum += roll
+            detailString += "$roll, "
+        }
+
+        val correctedString = detailString.removeRange(detailString.length - 2, detailString.length)
+
+        val rollTotal = dialog.findViewById<TextView>(R.id.rollTotal)
+        rollTotal.text = "$sum"
+
+        val rollDetails = dialog.findViewById<TextView>(R.id.rollDetails)
+        rollDetails.text = correctedString
+
+        val time = Calendar.getInstance().time
+        val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+        val formattedDate = formatter.format(time)
+
+        pageViewModel.addRollHistory(HistoryStamp.newInstance(sum, rollDisplay, correctedString, formattedDate))
+
+        dialog.show()
+    }
+
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event != null) {
+            val dX = xAccel - event.values[0]
+            val dY = yAccel - event.values[1]
+            val dZ = zAccel - event.values[2]
+
+            val combinedChange = sqrt(dX*dX + dY*dY + dZ*dZ)
+
+            changeVector.add(0, combinedChange)
+            changeVector.removeAt(10)
+
+            val totalChange = changeVector.sum()
+            accelStable = totalChange < 1f
+
             xAccel = event.values[0]
             yAccel = event.values[1]
             zAccel = event.values[2]
+
+
         }
     }
 
@@ -367,14 +398,20 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
         mSensorManager!!.unregisterListener(this)
     }
 
-    private fun diceRollThreadRunner(rollArea: Dialog)
+    private fun diceRollThreadRunner(rollDialog: Dialog)
     {
         val diceShakerThread = Thread {
-
-            val rollContainer = rollArea.findViewById<ConstraintLayout>(R.id.rollArea)
+            threadDead = false
+            val rollContainer = rollDialog.findViewById<ConstraintLayout>(R.id.rollArea)
             if(rollContainer != null) {
 
+                // Used to track how many frames they shook it for.
+                var stableFrames = 0
+                var activeFrames = 0
+                var shakeHappened = false
+
                 while (runThread) {
+
                     for (shakeDie in shakerDice) {
                         var newX = shakeDie.getImage().x + shakeDie.xVelocity
                         val newRight = newX + shakeDie.getImage().width
@@ -441,6 +478,32 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
                     }
 
                     sleep(1)
+
+
+                    if(accelStable)
+                    {
+                        stableFrames++
+                        activeFrames = 0
+                    }
+                    else
+                    {
+                        stableFrames = 0
+                        activeFrames++
+                    }
+
+                    if(activeFrames > 2000 && !shakeHappened)
+                    {
+                        shakeHappened = true
+                        activity?.runOnUiThread {
+                            val shakeText = rollDialog.findViewById<TextView>(R.id.shakeText)
+                            shakeText.text = getString(R.string.hold_still)
+                        }
+                    }
+
+                    if(stableFrames > 500 && shakeHappened)
+                    {
+                        runThread = false
+                    }
                 }
 
                 activity?.runOnUiThread {
@@ -450,6 +513,9 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
                     shakerDice.clear()
                 }
             }
+
+            rollDialog.dismiss()
+            threadDead = true
         }
 
         diceShakerThread.start()
