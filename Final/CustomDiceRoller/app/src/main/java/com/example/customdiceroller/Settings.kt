@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.widget.SeekBar
 import kotlinx.android.synthetic.main.activity_settings.*
+import kotlinx.android.synthetic.main.fragment_roll.*
 
 class Settings : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
 

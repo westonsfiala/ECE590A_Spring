@@ -15,12 +15,17 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    private var shakeSensitivity = 4f
+    private var shakeToRoll = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         view_pager.adapter = SectionsPagerAdapter(this, supportFragmentManager)
         tabs.setupWithViewPager(view_pager)
         setSupportActionBar(settingsToolbar)
+
+        setupPreferences()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -49,18 +54,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun isShakeToRoll() : Boolean
+    private fun setupPreferences()
     {
-        return getSharedPreferences(
+        shakeToRoll = getSharedPreferences(
             getString(R.string.preference_file_key), Context.MODE_PRIVATE)
             .getBoolean(getString(R.string.shake_preference_key),false)
+
+        shakeSensitivity = 10f - getSharedPreferences(
+            getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+            .getInt(getString(R.string.shake_sensitivity_key),4)
+    }
+
+    fun isShakeToRoll() : Boolean
+    {
+        return shakeToRoll
     }
 
     fun shakeSensitivity() : Float
     {
-        return getSharedPreferences(
-            getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-            .getInt(getString(R.string.shake_sensitivity_key),4).toFloat() + 1.0f
+        return shakeSensitivity
     }
 
 
