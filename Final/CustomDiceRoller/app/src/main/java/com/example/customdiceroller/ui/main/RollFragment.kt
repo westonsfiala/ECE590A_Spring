@@ -41,7 +41,11 @@ class RollFragment : Fragment() {
         // Inflate the layout for this fragment
         val createdView = inflater.inflate(R.layout.fragment_roll, container, false)
 
-        createdView.findViewById<ImageButton>(R.id.displayImage).setImageResource(imageID)
+        val icon = createdView.findViewById<ImageButton>(R.id.displayImage)
+        icon.setImageResource(imageID)
+        val containerWidth = container?.width
+        icon.maxWidth = containerWidth!!.div(4)
+
         createdView.findViewById<TextView>(R.id.displayText).text = rollName
 
         return createdView

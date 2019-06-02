@@ -57,12 +57,12 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
 
     private val dice = mapOf(
         4 to R.drawable.ic_d4,
-        6 to R.drawable.ic_perspective_dice_six,
-        8 to R.drawable.ic_dice_eight_faces_eight,
+        6 to R.drawable.ic_d6,
+        8 to R.drawable.ic_d8,
         10 to R.drawable.ic_d10,
         12 to R.drawable.ic_d12,
-        20 to R.drawable.ic_dice_twenty_faces_twenty,
-        100 to R.drawable.ic_rolling_dice_cup
+        20 to R.drawable.ic_d20,
+        100 to R.drawable.ic_unknown
         )
 
     private var numDice = 1
@@ -118,15 +118,9 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
     {
         val tableLayout = view.findViewById<TableLayout>(R.id.tableLayout)
 
-        val layoutParams = TableLayout.LayoutParams(
-            TableLayout.LayoutParams.MATCH_PARENT,
-            TableLayout.LayoutParams.MATCH_PARENT, 1.0f
-        )
-
         var rowInTable = 0
         var columnInRow = 0
         var line = TableRow(context)
-        line.layoutParams = layoutParams
         tableLayout.addView(line, rowInTable)
         line.id = "$rowInTable Line".hashCode()
         for(die in dice)
@@ -134,7 +128,6 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
             if(columnInRow >= 4)
             {
                 line = TableRow(context)
-                line.layoutParams = layoutParams
                 ++rowInTable
                 line.id = "$rowInTable Line".hashCode()
                 columnInRow = 0
@@ -152,7 +145,6 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
             val rollFragment = RollFragment.newInstance(dieNumber, dieID, this)
             fragmentManager?.beginTransaction()?.add(line.id, rollFragment, fragmentTag)?.commit()
             ++columnInRow
-
         }
     }
 
@@ -298,6 +290,9 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
             runThread = true
             for(dice in 0 until numDice) {
                 val die = ShakeDie(rollFragment.getDiceImageID())
+                die.getImage().maxWidth = rollArea.width.div(12)
+                die.getImage().maxHeight = rollArea.width.div(12)
+                die.getImage().adjustViewBounds = true
                 rollArea.addView(die.getImage())
                 die.getImage().x = Random.nextFloat() * rollArea.width.toFloat()
                 die.getImage().y = Random.nextFloat() * rollArea.height.toFloat()
@@ -401,6 +396,8 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
 
     private fun diceRollThreadRunner(rollDialog: Dialog)
     {
+        val mainActivity = activity!! as MainActivity
+
         val diceShakerThread = Thread {
             threadDead = false
             val rollContainer = rollDialog.findViewById<ConstraintLayout>(R.id.rollArea)
@@ -409,16 +406,18 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
                 // Used to track how many frames they shook it for.
                 var stableFrames = 0
                 var activeFrames = 0
+                var killFrames = 0
                 var shakeHappened = false
+                var killMovement = false
 
                 while (runThread) {
-
+                    val speedKillMod = 1.0f - (killFrames.toFloat() / mainActivity.holdDuration())
                     for (shakeDie in shakerDice) {
-                        var newX = shakeDie.getImage().x + shakeDie.xVelocity
+                        var newX = shakeDie.getImage().x + shakeDie.xVelocity * speedKillMod
                         val newRight = newX + shakeDie.getImage().width
-                        var newY = shakeDie.getImage().y + shakeDie.yVelocity
+                        var newY = shakeDie.getImage().y + shakeDie.yVelocity * speedKillMod
                         val newBottom = newY + shakeDie.getImage().height
-                        var newRotation = shakeDie.rotationSpeed
+                        var newRotation = shakeDie.rotationSpeed * speedKillMod
 
                         val tooLeft = newX < 0
                         val tooRight = newRight > rollContainer.width
@@ -492,7 +491,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
                         activeFrames++
                     }
 
-                    if(activeFrames > 2000 && !shakeHappened)
+                    if(activeFrames > mainActivity.shakeDuration() && !shakeHappened)
                     {
                         shakeHappened = true
                         activity?.runOnUiThread {
@@ -501,11 +500,23 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
                         }
                     }
 
-                    if(stableFrames > 1500 && shakeHappened)
+                    if(killMovement)
+                    {
+                        killFrames++
+                    }
+
+                    if(stableFrames > mainActivity.holdDuration() && shakeHappened)
+                    {
+                        killMovement = true
+                    }
+
+                    if(killFrames > mainActivity.holdDuration())
                     {
                         runThread = false
                     }
                 }
+
+                sleep(500)
 
                 activity?.runOnUiThread {
                     for(shakeDie in shakerDice) {

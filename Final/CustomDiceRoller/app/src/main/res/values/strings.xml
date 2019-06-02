@@ -15,5 +15,9 @@
     <string name="preference_file_key">CustomDiceRollerPreferencesKey</string>
     <string name="shake_preference_key">ShakePreferenceKey</string>
     <string name="shake_sensitivity_key">ShakeSensitivityKey</string>
+    <string name="shake_duration_key">ShakeDurationKey</string>
+    <string name="hold_duration_key">HoldDurationKey</string>
     <string name="shake_sensitivity">Shake Sensitivity</string>
+    <string name="shake_duration">Shake Duration</string>
+    <string name="hold_duration">Hold Duration</string>
 </resources>

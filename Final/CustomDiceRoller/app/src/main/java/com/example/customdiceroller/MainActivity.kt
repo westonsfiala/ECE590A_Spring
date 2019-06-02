@@ -17,6 +17,8 @@ class MainActivity : AppCompatActivity() {
 
     private var shakeSensitivity = 4f
     private var shakeToRoll = false
+    private var shakeDuration = 500
+    private var holdDuration = 500
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,8 +26,6 @@ class MainActivity : AppCompatActivity() {
         view_pager.adapter = SectionsPagerAdapter(this, supportFragmentManager)
         tabs.setupWithViewPager(view_pager)
         setSupportActionBar(settingsToolbar)
-
-        setupPreferences()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -54,15 +54,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        setupPreferences()
+    }
+
     private fun setupPreferences()
     {
         shakeToRoll = getSharedPreferences(
             getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-            .getBoolean(getString(R.string.shake_preference_key),false)
+            .getBoolean(getString(R.string.shake_preference_key), DEFAULT_SHAKE_ENABLED)
 
         shakeSensitivity = 10f - getSharedPreferences(
             getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-            .getInt(getString(R.string.shake_sensitivity_key),4)
+            .getInt(getString(R.string.shake_sensitivity_key), DEFAULT_SHAKE_SENSITIVITY)
+
+        shakeDuration = 500 + getSharedPreferences(
+            getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+            .getInt(getString(R.string.shake_duration_key), DEFAULT_SHAKE_DURATION) * 100
+
+        holdDuration = 500 + getSharedPreferences(
+            getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+            .getInt(getString(R.string.hold_duration_key), DEFAULT_HOLD_DURATION) * 100
     }
 
     fun isShakeToRoll() : Boolean
@@ -73,6 +86,16 @@ class MainActivity : AppCompatActivity() {
     fun shakeSensitivity() : Float
     {
         return shakeSensitivity
+    }
+
+    fun shakeDuration() : Int
+    {
+        return shakeDuration
+    }
+
+    fun holdDuration() : Int
+    {
+        return holdDuration
     }
 
 
