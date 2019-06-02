@@ -62,7 +62,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
         10 to R.drawable.ic_d10,
         12 to R.drawable.ic_d12,
         20 to R.drawable.ic_d20,
-        100 to R.drawable.ic_unknown
+        100 to R.drawable.ic_d100
         )
 
     private var numDice = 1
