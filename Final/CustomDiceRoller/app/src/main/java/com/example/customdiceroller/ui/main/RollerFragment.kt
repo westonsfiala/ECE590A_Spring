@@ -265,7 +265,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
     {
         val mainActivity = activity!! as MainActivity
 
-        if(mainActivity.shakeToRoll())
+        if(mainActivity.isShakeToRoll())
         {
             runShakeRoller(rollFragment)
         }
@@ -377,7 +377,8 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
             changeVector.removeAt(10)
 
             val totalChange = changeVector.sum()
-            accelStable = totalChange < 1f
+            val mainActivity = activity!! as MainActivity
+            accelStable = totalChange < mainActivity.shakeSensitivity()
 
             xAccel = event.values[0]
             yAccel = event.values[1]
@@ -429,7 +430,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
                         }
 
                         if (tooLeft || tooRight) {
-                            shakeDie.xVelocity *= -.75f
+                            shakeDie.xVelocity *= -.85f
                             // Throw a bit of randomness in.
                             shakeDie.xVelocity += Random.nextFloat() - 0.5f
                         }
@@ -444,7 +445,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
                         }
 
                         if (tooHigh || tooLow) {
-                            shakeDie.yVelocity *= -.75f
+                            shakeDie.yVelocity *= -.85f
                             // Throw a bit of randomness in.
                             shakeDie.yVelocity += Random.nextFloat() - 0.5f
                         }
@@ -500,7 +501,7 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
                         }
                     }
 
-                    if(stableFrames > 500 && shakeHappened)
+                    if(stableFrames > 1500 && shakeHappened)
                     {
                         runThread = false
                     }

@@ -49,10 +49,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun shakeToRoll() : Boolean
+    fun isShakeToRoll() : Boolean
     {
         return getSharedPreferences(
             getString(R.string.preference_file_key), Context.MODE_PRIVATE)
             .getBoolean(getString(R.string.shake_preference_key),false)
     }
+
+    fun shakeSensitivity() : Float
+    {
+        return getSharedPreferences(
+            getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+            .getInt(getString(R.string.shake_sensitivity_key),4).toFloat() + 1.0f
+    }
+
+
 }

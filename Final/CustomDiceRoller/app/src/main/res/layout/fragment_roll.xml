@@ -17,7 +17,8 @@
             android:layout_marginStart="8dp"
             app:layout_constraintDimensionRatio="1:1"
             android:scaleType="fitCenter"
-            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/displayText"/>
+            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/displayText"
+            android:background="#00FFFFFF"/>
     <TextView
             android:text="@string/temp"
             android:layout_width="0dp"
