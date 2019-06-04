@@ -1,17 +1,14 @@
-package com.example.customdiceroller
+package com.fialasfiasco.customdiceroller
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.v7.app.AlertDialog
 import android.widget.SeekBar
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_settings.*
-import kotlinx.android.synthetic.main.fragment_roll.*
 
-const val DEFAULT_SHAKE_ENABLED = false
+const val DEFAULT_SHAKE_ENABLED = true
 const val DEFAULT_SHAKE_SENSITIVITY = 4
 const val DEFAULT_SHAKE_DURATION = 4
 const val DEFAULT_HOLD_DURATION = 4

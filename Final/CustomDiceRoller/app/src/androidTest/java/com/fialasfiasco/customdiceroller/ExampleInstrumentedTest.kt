@@ -1,4 +1,4 @@
-package com.example.customdiceroller
+package com.fialasfiasco.customdiceroller
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4

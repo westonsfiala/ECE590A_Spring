@@ -1,4 +1,4 @@
-package com.example.customdiceroller.ui.main
+package com.fialasfiasco.customdiceroller.ui.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +8,7 @@ import android.widget.TextView
 import android.support.v4.app.Fragment
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import com.example.customdiceroller.R
+import com.fialasfiasco.customdiceroller.R
 
 /**
  * A placeholder fragment containing a simple view.

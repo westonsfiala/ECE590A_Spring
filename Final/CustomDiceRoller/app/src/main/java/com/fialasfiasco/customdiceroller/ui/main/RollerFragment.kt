@@ -1,4 +1,4 @@
-package com.example.customdiceroller.ui.main
+package com.fialasfiasco.customdiceroller.ui.main
 
 import android.app.Dialog
 import android.arch.lifecycle.Observer
@@ -16,11 +16,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.example.customdiceroller.MainActivity
+import com.fialasfiasco.customdiceroller.MainActivity
 
-import com.example.customdiceroller.R
+import com.fialasfiasco.customdiceroller.R
+import kotlinx.android.synthetic.main.fragment_roller.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.min
 import kotlin.math.sqrt
 import kotlin.random.Random
 
@@ -272,6 +274,11 @@ class RollerFragment : Fragment(), RollFragment.OnFragmentInteractionListener, S
         val dialog = Dialog(context!!)
         dialog.setContentView(R.layout.diceroll_layout)
         val rollArea = dialog.findViewById<ConstraintLayout>(R.id.rollArea)
+
+        val minDim = min(rollerLayout.width, rollerLayout.height).times(3).div(4)
+
+        rollArea.minWidth = minDim
+        rollArea.minHeight = minDim
 
         rollArea.setOnClickListener {
             dialog.dismiss()

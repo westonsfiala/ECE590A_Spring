@@ -1,4 +1,4 @@
-package com.example.customdiceroller.ui.main
+package com.fialasfiasco.customdiceroller.ui.main
 
 import android.content.Context
 import android.net.Uri
@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-import com.example.customdiceroller.R
+import com.fialasfiasco.customdiceroller.R
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

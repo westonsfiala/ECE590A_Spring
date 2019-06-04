@@ -1,4 +1,4 @@
-package com.example.customdiceroller
+package com.fialasfiasco.customdiceroller
 
 import org.junit.Test
 

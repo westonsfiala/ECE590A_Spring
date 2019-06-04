@@ -10,8 +10,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="temp">temp</string>
     <string name="clear_history">Clear History</string>
-    <string name="shake_to_roll">Shake To Roll</string>
-    <string name="hold_still">Now Hold Still</string>
+    <string name="shake_to_roll">Shake!</string>
+    <string name="hold_still">Hold Still</string>
     <string name="preference_file_key">CustomDiceRollerPreferencesKey</string>
     <string name="shake_preference_key">ShakePreferenceKey</string>
     <string name="shake_sensitivity_key">ShakeSensitivityKey</string>
@@ -20,4 +20,12 @@
     <string name="shake_sensitivity">Shake Sensitivity</string>
     <string name="shake_duration">Shake Duration</string>
     <string name="hold_duration">Hold Duration</string>
+    <string name="about">About</string>
+    <string name="rate_this_app">Rate this app</string>
+    <string name="developed_by_weston_fiala">Developed by Weston Fiala</string>
+    <string name="images_are_provided_by">Images are provided by:\n\n
+        - Delapouite (http://delapouite.com/) under the CC BY 3.0
+        (http://creativecommons.org/licenses/by/3.0/)
+    </string>
+    <string name="inpiration">Inspiration for this app came from RPG simple dice. Check out their awesome app!</string>
 </resources>

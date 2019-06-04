@@ -1,4 +1,4 @@
-package com.example.customdiceroller.ui.main
+package com.fialasfiasco.customdiceroller.ui.main
 
 
 import android.arch.lifecycle.Observer
@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.example.customdiceroller.R
+import com.fialasfiasco.customdiceroller.R
 
 
 

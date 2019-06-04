@@ -1,16 +1,17 @@
-package com.example.customdiceroller
+package com.fialasfiasco.customdiceroller
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
-import com.example.customdiceroller.ui.main.PageViewModel
-import com.example.customdiceroller.ui.main.SectionsPagerAdapter
+import com.fialasfiasco.customdiceroller.ui.main.PageViewModel
+import com.fialasfiasco.customdiceroller.ui.main.SectionsPagerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -45,9 +46,19 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.settings_item -> {
-
                 val settingsIntent = Intent(this, Settings::class.java)
                 startActivity(settingsIntent)
+                true
+            }
+            R.id.aboutItem -> {
+                val aboutIntent = Intent(this, AboutActivity::class.java)
+                startActivity(aboutIntent)
+                true
+            }
+            R.id.rateThisApp ->
+            {
+                val rateIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + BuildConfig.APPLICATION_ID))
+                startActivity(rateIntent)
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -1,4 +1,4 @@
-package com.example.customdiceroller.ui.main
+package com.fialasfiasco.customdiceroller.ui.main
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import com.example.customdiceroller.R
+import com.fialasfiasco.customdiceroller.R
 import kotlinx.android.synthetic.main.fragment_roll.*
 
 private const val ARG_DICE_NUMBER = "diceNumber"
@@ -21,7 +21,7 @@ private const val ARG_IMAGE_ID = "imageID"
 class RollFragment : Fragment() {
     private var rollName: String = "TEMP"
     private var dieNumber = 0
-    private var imageID: Int = R.drawable.ic_launcher_foreground
+    private var imageID: Int = R.drawable.ic_d20_icon
     private var mListener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
